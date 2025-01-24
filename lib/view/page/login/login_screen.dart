@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pjspaul_admin/route/app_routes.dart';
 import 'package:pjspaul_admin/utils/validator.dart';
 import 'package:pjspaul_admin/view/page/main/main_screen.dart';
 import 'package:pjspaul_admin/view/widget/custom_button.dart';
@@ -54,7 +55,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     onPressed: (){
                       if(loginForm.currentState!.validate()){
                         if(usernameController.text == "admin" && passwordController.text == "admin"){
-                          Get.to(()=>MainScreen());
+                          Get.toNamed(AppRoutes.main);
                         } else {
                           var snackBar = SnackBar(content: Text('Invalid Credential!'), backgroundColor: const Color.fromARGB(255, 242, 22, 6),);
                           ScaffoldMessenger.of(context).showSnackBar(snackBar);

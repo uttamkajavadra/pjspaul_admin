@@ -20,7 +20,7 @@ class _MainScreenState extends State<MainScreen> {
     {"title": "Believers Registrations", "screen": BeliverRegistrationScreen()},
     {"title": "Others", "screen": OtherScreen()},
   ];
-  RxInt selectedIndex = 0.obs;
+  RxInt selectedIndex = 1.obs;
   @override
   Widget build(BuildContext context) {
     return Scaffold(

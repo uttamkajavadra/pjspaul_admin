@@ -9,7 +9,7 @@ class OtherController extends GetxController{
   List<List<String>> list = [
     ["Location"],
     ["Location"],
-    ["TV Program Name"],
+    ["TV Program Name", "delete"],
     ["Email Address"],
     ["Donor Name", "Contact Number", "Donation Amount", "Payment Method"],
   ];
@@ -41,6 +41,7 @@ class OtherController extends GetxController{
 
   final lifeTVProgram = GlobalKey<FormState>();
   TextEditingController tvProgramController = TextEditingController();
+  RxList<String> listId = <String>[].obs;
 
   Future<void> addTVProgram(BuildContext context) async {
     try {
@@ -71,10 +72,29 @@ class OtherController extends GetxController{
     firestore.collection('life_tv_program').get().then((snapshot) {
       snapshot.docs.forEach((doc) {
         var data = doc.data();
-        listData.add([data["tv_program"]]);
+        listData.add([data["tv_program"], "delete"]);
+        listId.add(doc.id);
       });
     });
   }
+
+  Future<void> deleteLifeTVProgram(BuildContext context, int index) async {
+  try {
+    ProgressBar.instance.showProgressbar(context);
+    await FirebaseFirestore.instance
+        .collection('life_tv_program') // Replace with your collection name
+        .doc(listId[index]) // Document ID
+        .delete();
+    ProgressBar.instance.stopProgressBar(context);
+    CustomToast.instance.showMsg("Delete successfully");
+  } catch (e) {
+    ProgressBar.instance.stopProgressBar(context);
+    CustomToast.instance.showMsg("Something went wrong");
+  } finally {
+    getLifeTVProgram();
+  }
+}
+
 
   Future<void> getEmailAddress() async {
     listData.clear();

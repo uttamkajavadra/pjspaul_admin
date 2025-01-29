@@ -132,7 +132,15 @@ class _OtherScreenState extends State<OtherScreen> {
                                       child: Text("View", style: TextStyle(color: Colors.white),),
                                     ),
                                   )
-                                  : Text(
+                                  : (controller.listData[i][j].toString() == "delete")
+                                      ? GestureDetector(
+                                  onTap: () async {
+                                    if (controller.selectedIndex.value == 2) {
+                                      controller.deleteLifeTVProgram(context, i);
+                                    }
+                                  },
+                                  child: Icon(Icons.delete_rounded))
+                                  :Text(
                                   controller.listData[i][j],
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(color: Colors.black, fontSize: 14, fontWeight: FontWeight.w400),

@@ -1,7 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pjspaul_admin/view/widget/custom_toast.dart';
+import 'package:pjspaul_admin/view/widget/progressbar.dart';
 
 class OtherController extends GetxController{
+  RxBool isShowAdd = false.obs;
   List<List<String>> list = [
     ["Location"],
     ["Location"],
@@ -33,6 +37,32 @@ class OtherController extends GetxController{
         listData.add([data["ministry_location"]]);
       });
     });
+  }
+
+  final lifeTVProgram = GlobalKey<FormState>();
+  TextEditingController tvProgramController = TextEditingController();
+
+  Future<void> addTVProgram(BuildContext context) async {
+    try {
+      ProgressBar.instance.showProgressbar(context);
+      final FirebaseFirestore firestore = FirebaseFirestore.instance;
+      CollectionReference request = firestore.collection('life_tv_program');
+
+      await request.add({
+        'tv_program': tvProgramController.text,
+      });
+      ProgressBar.instance.stopProgressBar(context);
+      // Get.back();
+      CustomToast.instance.showMsg("Added Successfully");
+    } catch (e) {
+      ProgressBar.instance.stopProgressBar(context);
+      // Get.back();
+      print("Error $e");
+      CustomToast.instance.showMsg("Something went wrong");
+    } finally{
+      tvProgramController.clear();
+      getLifeTVProgram();
+    }
   }
 
   Future<void> getLifeTVProgram() async {

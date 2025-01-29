@@ -39,6 +39,7 @@ class _BeliverRegistrationScreenState extends State<BeliverRegistrationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -77,7 +78,9 @@ class _BeliverRegistrationScreenState extends State<BeliverRegistrationScreen> {
           ),
           const SizedBox(height: 20,),
           Obx(() {
-            return Container(
+            return (controller.listData.isEmpty)?
+            Text("No data found")
+            :Container(
               decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(12),

@@ -153,7 +153,9 @@ class _BeliverSpritualContentScreenState extends State<BeliverSpritualContentScr
                     const SizedBox(
                       height: 20,
                     ),
-                    Container(
+                    (controller.listData.isEmpty)?
+            Text("No data found")
+            :Container(
                       decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(12),

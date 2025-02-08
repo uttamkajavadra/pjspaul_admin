@@ -126,7 +126,7 @@ class BeliverSpritualContentController extends GetxController{
       await fileImageRef.putData(selectedImageFile.value!);
       String imageUrl = await fileImageRef.getDownloadURL();
 
-      final fileRef = storageRef.child('today_blessing/${DateTime.now().millisecondsSinceEpoch}.png');
+      final fileRef = storageRef.child('today_blessing/${DateTime.now().millisecondsSinceEpoch}.mp4');
       await fileRef.putData(selectedFile.value!);
       String videoUrl = await fileRef.getDownloadURL();
 
@@ -345,7 +345,7 @@ Future<void> deleteTodayBlessing(BuildContext context, int index) async {
       // await fileImageRef.putData(selectedImageFile.value!);
       // String imageUrl = await fileImageRef.getDownloadURL();
 
-      final fileRef = storageRef.child('life_message/${DateTime.now().millisecondsSinceEpoch}.png');
+      final fileRef = storageRef.child('life_message/${DateTime.now().millisecondsSinceEpoch}.mp4');
       await fileRef.putData(selectedFile.value!);
       String videoUrl = await fileRef.getDownloadURL();
 
@@ -411,7 +411,7 @@ Future<void> deleteTodayBlessing(BuildContext context, int index) async {
       // await fileImageRef.putData(selectedImageFile.value!);
       // String imageUrl = await fileImageRef.getDownloadURL();
 
-      final fileRef = storageRef.child('life_song/${DateTime.now().millisecondsSinceEpoch}.png');
+      final fileRef = storageRef.child('life_song/${DateTime.now().millisecondsSinceEpoch}.mp3');
       await fileRef.putData(selectedFile.value!);
       String url = await fileRef.getDownloadURL();
 

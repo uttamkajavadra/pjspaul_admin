@@ -4,6 +4,7 @@ import 'package:pjspaul_admin/view/page/beliver_registration/beliver_registratio
 import 'package:pjspaul_admin/view/page/beliver_request_form/beliver_request_form_screen.dart';
 import 'package:pjspaul_admin/view/page/beliver_spritual_content/beliver_spritual_content_screen.dart';
 import 'package:pjspaul_admin/view/page/other/other_screen.dart';
+import 'package:pjspaul_admin/view/page/upload_image/upload_image_screen.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -15,6 +16,7 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
 
   List<Map<String, dynamic>> list = [
+    {"title": "Upload Image Screen", "screen": UploadImageScreen()},
     {"title": "Believers Request Forms", "screen": BeliverRequestFormScreen()},
     {"title": "Believers Spiritual Content", "screen": BeliverSpritualContentScreen()},
     {"title": "Believers Registrations", "screen": BeliverRegistrationScreen()},

@@ -10,7 +10,7 @@ class BeliverRequestFormController extends GetxController{
     ["Full Name", "Contact Number", "Suggestions/Feedback"],
     ["Full Name", "Location", "Contact Number", "Reason for Appointment requested", "Preferred Date"],
     ["Full Name", "Contact Number", "Child's Name", "Gender", "Complete Address"],
-    ["Full Name", "Complete Address", "Contact Number", "Volunteering Area of Interest", "Profession"]
+    ["Full Name", "Complete Address", "Contact Number", "Volunteering Area of Interest", "Profession", "Volunteer Type"]
   ];
   RxInt selectedIndex = 0.obs;
 
@@ -99,7 +99,7 @@ class BeliverRequestFormController extends GetxController{
     firestore.collection('volunteer_enrollment').get().then((snapshot) {
       snapshot.docs.forEach((doc) {
         var data = doc.data();
-        listData.add([data["name"], data["address"], data["contact"], data["area_of_interest"], data["profession"]]);
+        listData.add([data["name"], data["address"], data["contact"], data["area_of_interest"], data["profession"], data["volunteer_type"]]);
       });
     });
   }

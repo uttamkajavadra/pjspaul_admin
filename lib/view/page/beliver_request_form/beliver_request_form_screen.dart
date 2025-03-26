@@ -31,6 +31,8 @@ class _BeliverRequestFormScreenState extends State<BeliverRequestFormScreen> {
                           controller.getPastorRequest();
                         } else if(controller.selectedIndex.value == 6){
                           controller.getChildDedication();
+                        } else if(controller.selectedIndex.value == 7){
+                          controller.getVolunteerEnrollment();
                         }
     super.initState();
   }
@@ -56,7 +58,8 @@ class _BeliverRequestFormScreenState extends State<BeliverRequestFormScreen> {
                         "Prayer & Counseling Request",
                         "Suggestions/Feedback Request",
                         "Pastor's Appointment Request",
-                        "Child Dedication Request"
+                        "Child Dedication Request",
+                        "Volunteer Enrollment Request"
                       ],
                       onChanged: (index) {
                         controller.selectedIndex.value = index;
@@ -74,6 +77,8 @@ class _BeliverRequestFormScreenState extends State<BeliverRequestFormScreen> {
                           controller.getPastorRequest();
                         } else if(index == 6){
                           controller.getChildDedication();
+                        } else if(index == 7){
+                          controller.getVolunteerEnrollment();
                         }
                       },
                       validator: (value) => null);

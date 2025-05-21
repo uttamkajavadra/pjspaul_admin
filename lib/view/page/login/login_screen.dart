@@ -54,7 +54,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: CustomElevatedButton(
                     onPressed: (){
                       if(loginForm.currentState!.validate()){
-                        if(usernameController.text == "admin" && passwordController.text == "admin"){
+                        if(usernameController.text == "pjspaulministry@gmail.com" && passwordController.text == "PjsP@u1"){
                           Get.toNamed(AppRoutes.main);
                         } else {
                           var snackBar = SnackBar(content: Text('Invalid Credential!'), backgroundColor: const Color.fromARGB(255, 242, 22, 6),);

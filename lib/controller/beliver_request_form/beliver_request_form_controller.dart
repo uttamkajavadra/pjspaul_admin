@@ -8,7 +8,7 @@ class BeliverRequestFormController extends GetxController{
     ["Full Name", "Location", "Contact Number", "Visit requested for"],
     ["Full Name", "Contact Number", "Counseling Requested For"],
     ["Full Name", "Contact Number", "Suggestions/Feedback"],
-    ["Full Name", "Location", "Contact Number", "Reason for Appointment requested", "Preferred Date"],
+    ["Full Name", "Location", "Contact Number", "WhatsApp", "Reason for Appointment requested", "Preferred Date"],
     ["Full Name", "Contact Number", "Child's Name", "Gender", "Complete Address"],
     ["Full Name", "Complete Address", "Contact Number", "Volunteering Area of Interest", "Profession", "Volunteer Type"]
   ];
@@ -77,7 +77,7 @@ class BeliverRequestFormController extends GetxController{
     firestore.collection('pastor_request').get().then((snapshot) {
       snapshot.docs.forEach((doc) {
         var data = doc.data();
-        listData.add([data["name"], data["location"], data["contact"], data["appointment"], data["date"]]);
+        listData.add([data["name"], data["location"], data["contact"], data["whatsapp"], data["appointment"], data["date"]]);
       });
     });
   }

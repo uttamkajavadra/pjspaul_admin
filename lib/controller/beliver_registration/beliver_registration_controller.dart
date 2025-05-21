@@ -4,8 +4,8 @@ import 'package:get/get.dart';
 class BeliverRegistrationController extends GetxController{
   List<List<String>> list = [
     ["Full Name", "Location", "Contact Number", "Age", "Profession"],
-    ["Full Name", "Address", "Contact Number", "I am a", "Ministry Name", "Ministry Details", "Ministry started Date"],
-    ["Full Name", "Address", "Contact Number", "Gender", "Education", "Reason to pursue Bible college"],
+    ["Full Name", "Address", "Contact Number", "I am a", "Church Name", "Church Address", "Current Profession", "Ministry started Date"],
+    ["Full Name", "Address", "Contact Number", "Age", "Gender", "Education", "Reason to pursue Bible college"],
     ["Full Name", "Contact Number", "Complete Address", "Business Name", "Industry"],
     ["Full Name", "Contact Number", "Complete Address", "Gender", "Attending Church Since"],
     ["Full Name", "Profession", "Speciality", "Contact Number", "Working Organization"],
@@ -32,7 +32,7 @@ class BeliverRegistrationController extends GetxController{
     firestore.collection('leader_register').get().then((snapshot) {
       snapshot.docs.forEach((doc) {
         var data = doc.data();
-        listData.add([data["name"], data["location"], data["contact"], data["i_am"], data["ministry_name"], data["ministry_detail"], data["ministry_started"]]);
+        listData.add([data["name"], data["location"], data["contact"], data["i_am"], data["church_name"], data["church_address"], data["current_profession"], data["ministry_started"]]);
       });
     });
   }
@@ -43,7 +43,7 @@ class BeliverRegistrationController extends GetxController{
     firestore.collection('college_register').get().then((snapshot) {
       snapshot.docs.forEach((doc) {
         var data = doc.data();
-        listData.add([data["name"], data["location"], data["contact"], data["gender"], data["education"], data["reason"]]);
+        listData.add([data["name"], data["location"], data["contact"], data["birth_date"], data["gender"], data["education"], data["reason"]]);
       });
     });
   }

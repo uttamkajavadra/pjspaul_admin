@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pjspaul_admin/controller/beliver_request_form/beliver_request_form_controller.dart';
 import 'package:pjspaul_admin/view/widget/custom_dropdown.dart';
-import 'dart:html' as html;
+// import 'dart:html' as html;
 
 class BeliverRequestFormScreen extends StatefulWidget {
   const BeliverRequestFormScreen({super.key});
@@ -134,7 +134,16 @@ class _BeliverRequestFormScreenState extends State<BeliverRequestFormScreen> {
                           (controller.listData[i][j].startsWith("http"))
                           ? GestureDetector(
                             onTap: (){
-                              html.window.open(controller.listData[i][j], '_blank');
+                              // html.window.open(controller.listData[i][j], '_blank');
+                              showDialog(context: context, builder: (context){
+                                          return Dialog(
+                                            child: Container(
+                                              width: 500,
+                                              height: 500,
+                                              child: Image.network(controller.listData[i][j],),
+                                            ),
+                                          );
+                                        });
                             },
                             child: Container(
                               padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),

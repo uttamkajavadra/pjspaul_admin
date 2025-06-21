@@ -33,7 +33,7 @@ class MyApp extends StatelessWidget {
       ),
       // home: const MainScreen(),
       getPages: AppPages.pages,
-      initialRoute: AppRoutes.main,
+      initialRoute: AppRoutes.login,
     );
   }
 }

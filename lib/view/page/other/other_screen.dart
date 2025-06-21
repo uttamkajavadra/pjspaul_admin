@@ -4,7 +4,7 @@ import 'package:pjspaul_admin/controller/other/other_controller.dart';
 import 'package:pjspaul_admin/view/page/other/tabs/life_changing_message_live.dart';
 import 'package:pjspaul_admin/view/widget/custom_button.dart';
 import 'package:pjspaul_admin/view/widget/custom_dropdown.dart';
-import 'dart:html' as html;
+// import 'dart:html' as html;
 
 class OtherScreen extends StatefulWidget {
   const OtherScreen({super.key});
@@ -139,7 +139,16 @@ class _OtherScreenState extends State<OtherScreen> {
                                       DataCell((controller.listData[i][j].startsWith("http"))
                                           ? GestureDetector(
                                               onTap: () {
-                                                html.window.open(controller.listData[i][j], '_blank');
+                                                // html.window.open(controller.listData[i][j], '_blank');
+                                                showDialog(context: context, builder: (context){
+                                          return Dialog(
+                                            child: Container(
+                                              width: 500,
+                                              height: 500,
+                                              child: Image.network(controller.listData[i][j],),
+                                            ),
+                                          );
+                                        });
                                               },
                                               child: Container(
                                                 padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),

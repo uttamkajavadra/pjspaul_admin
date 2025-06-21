@@ -10,6 +10,8 @@ import 'package:pjspaul_admin/view/widget/custom_toast.dart';
 import 'package:pjspaul_admin/view/widget/progressbar.dart';
 
 class BeliverSpritualContentController extends GetxController{
+  RxBool isGo = true.obs;
+
   RxBool isShowAdd = false.obs;
   List<List<String>> list = [
     [],
@@ -101,15 +103,20 @@ class BeliverSpritualContentController extends GetxController{
   }
 
   Future<void> getRadioLink() async {
+    isGo.value = false;
     listData.clear();
     listId.clear();
     final FirebaseFirestore firestore = FirebaseFirestore.instance;
     firestore.collection('radio').get().then((snapshot) {
+      listData.clear();
+    listId.clear();
       snapshot.docs.forEach((doc) {
         var data = doc.data();
         listId.add(doc.id);
         listData.add([data["link"]]);
       });
+      print("getRadioLink");
+      isGo.value = true;
     });
   }
 
@@ -154,16 +161,21 @@ class BeliverSpritualContentController extends GetxController{
   }
 
   Future<void> getTodayBlessing() async {
+    isGo.value = false;
     listData.clear();
     listId.clear();
     final FirebaseFirestore firestore = FirebaseFirestore.instance;
     firestore.collection('today_blessing').get().then((snapshot) {
+      listData.clear();
+      listId.clear();
       snapshot.docs.forEach((doc) {
         listId.add(doc.id);
         var data = doc.data();
         listId.add(doc.id);
         listData.add([data["blessing"], data["image"], data["video"], "delete"]);
       });
+       print("getTodayBlessing");
+       isGo.value = true;
     });
   }
 
@@ -237,15 +249,21 @@ Future<void> deleteTodayBlessing(BuildContext context, int index) async {
   }
   
   Future<void> getUpcomingEvent() async {
+    isGo.value = false;
     listData.clear();
     listId.clear();
     final FirebaseFirestore firestore = FirebaseFirestore.instance;
     firestore.collection('upcoming_event').get().then((snapshot) {
+      listData.clear();
+      listId.clear();
       snapshot.docs.forEach((doc) {
         var data = doc.data();
         listId.add(doc.id);
         listData.add([data["event_title"], data["location"], "${data["date"]} ${data["time"]}", data["description"], "delete"]);
+        
       });
+      print("getUpcomingEvent");
+              isGo.value = true;
     });
   }
 
@@ -305,16 +323,21 @@ Future<void> deleteTodayBlessing(BuildContext context, int index) async {
   }
 
   Future<void> getShortMessage() async {
+    isGo.value = false;
     listData.clear();
     listId.clear();
     final FirebaseFirestore firestore = FirebaseFirestore.instance;
     firestore.collection('short_message').get().then((snapshot) {
+      listData.clear();
+      listId.clear();
       snapshot.docs.forEach((doc) {
         var data = doc.data();
         listId.add(doc.id);
         listData.add([data["title"], data["message"], "delete"]);
       });
-    });
+      print("getShortMessage");
+        isGo.value = true;
+      });
   }
 
   Future<void> deleteShortMessage(BuildContext context, int index) async {
@@ -371,15 +394,20 @@ Future<void> deleteTodayBlessing(BuildContext context, int index) async {
   }
 
   Future<void> getLifeMessage() async {
+    isGo.value = false;
     listData.clear();
     listId.clear();
     final FirebaseFirestore firestore = FirebaseFirestore.instance;
     firestore.collection('life_message').get().then((snapshot) {
+      listData.clear();
+      listId.clear();
       snapshot.docs.forEach((doc) {
         var data = doc.data();
         listId.add(doc.id);
         listData.add([data["title"], data["video"], "delete"]);
       });
+       print("getLifeMessage");
+               isGo.value = true;
     });
   }
 
@@ -437,15 +465,20 @@ Future<void> deleteTodayBlessing(BuildContext context, int index) async {
   }
 
   Future<void> getLifeSong() async {
+    isGo.value = false;
     listData.clear();
     listId.clear();
     final FirebaseFirestore firestore = FirebaseFirestore.instance;
     firestore.collection('life_song').get().then((snapshot) {
+      listData.clear();
+      listId.clear();
       snapshot.docs.forEach((doc) {
         var data = doc.data();
         listId.add(doc.id);
         listData.add([data["title"], data["audio"], "delete"]);
       });
+      print("getLifeSong");
+              isGo.value = true;
     });
   }
 

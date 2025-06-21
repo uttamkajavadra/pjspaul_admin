@@ -17,6 +17,27 @@ class _BeliverRequestFormScreenState extends State<BeliverRequestFormScreen> {
 
   @override
   void initState() {
+    // if (controller.selectedIndex.value == 0) {
+    //                       controller.getPrayerRequest();
+    //                     } else if(controller.selectedIndex.value == 1){
+    //                       controller.getTestimonyRequest();
+    //                     } else if(controller.selectedIndex.value == 2){
+    //                       controller.getCottagePrayer();
+    //                     } else if(controller.selectedIndex.value == 3){
+    //                       controller.getCounselingRequest();
+    //                     } else if(controller.selectedIndex.value == 4){
+    //                       controller.getFeedbackRequest();
+    //                     } else if(controller.selectedIndex.value == 5){
+    //                       controller.getPastorRequest();
+    //                     } else if(controller.selectedIndex.value == 6){
+    //                       controller.getChildDedication();
+    //                     } else if(controller.selectedIndex.value == 7){
+    //                       controller.getVolunteerEnrollment();
+    //                     }
+    super.initState();
+  }
+  @override
+  Widget build(BuildContext context) {
     if (controller.selectedIndex.value == 0) {
                           controller.getPrayerRequest();
                         } else if(controller.selectedIndex.value == 1){
@@ -34,58 +55,54 @@ class _BeliverRequestFormScreenState extends State<BeliverRequestFormScreen> {
                         } else if(controller.selectedIndex.value == 7){
                           controller.getVolunteerEnrollment();
                         }
-    super.initState();
-  }
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Spacer(),
-              SizedBox(
-                width: 300,
-                child: Obx(() {
-                  return CustomDropDown(
-                      value: controller.selectedIndex.value,
-                      items: [
-                        "Prayer Request",
-                        "Testimony Request",
-                        "Cottage Prayers/Hospital Visit Request",
-                        "Prayer & Counseling Request",
-                        "Suggestions/Feedback Request",
-                        "Pastor's Appointment Request",
-                        "Child Dedication Request",
-                        "Volunteer Enrollment Request"
-                      ],
-                      onChanged: (index) {
-                        controller.selectedIndex.value = index;
-                        if (index == 0) {
-                          controller.getPrayerRequest();
-                        } else if(index == 1){
-                          controller.getTestimonyRequest();
-                        } else if(index == 2){
-                          controller.getCottagePrayer();
-                        } else if(index == 3){
-                          controller.getCounselingRequest();
-                        } else if(index == 4){
-                          controller.getFeedbackRequest();
-                        } else if(index == 5){
-                          controller.getPastorRequest();
-                        } else if(index == 6){
-                          controller.getChildDedication();
-                        } else if(index == 7){
-                          controller.getVolunteerEnrollment();
-                        }
-                      },
-                      validator: (value) => null);
-                }),
-              ),
-            ],
-          ),
+          // Row(
+          //   children: [
+          //     Spacer(),
+          //     SizedBox(
+          //       width: 300,
+          //       child: Obx(() {
+          //         return CustomDropDown(
+          //             value: controller.selectedIndex.value,
+          //             items: [
+          //               "Prayer Request",
+          //               "Testimony Request",
+          //               "Cottage Prayers/Hospital Visit Request",
+          //               "Prayer & Counseling Request",
+          //               "Suggestions/Feedback",
+          //               "Pastor's Appointment Request",
+          //               "Child Dedication Request",
+          //               "Volunteer Enrollment Request"
+          //             ],
+          //             onChanged: (index) {
+          //               controller.selectedIndex.value = index;
+          //               if (index == 0) {
+          //                 controller.getPrayerRequest();
+          //               } else if(index == 1){
+          //                 controller.getTestimonyRequest();
+          //               } else if(index == 2){
+          //                 controller.getCottagePrayer();
+          //               } else if(index == 3){
+          //                 controller.getCounselingRequest();
+          //               } else if(index == 4){
+          //                 controller.getFeedbackRequest();
+          //               } else if(index == 5){
+          //                 controller.getPastorRequest();
+          //               } else if(index == 6){
+          //                 controller.getChildDedication();
+          //               } else if(index == 7){
+          //                 controller.getVolunteerEnrollment();
+          //               }
+          //             },
+          //             validator: (value) => null);
+          //       }),
+          //     ),
+          //   ],
+          // ),
           const SizedBox(
             height: 20,
           ),

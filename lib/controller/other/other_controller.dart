@@ -5,6 +5,7 @@ import 'package:pjspaul_admin/view/widget/custom_toast.dart';
 import 'package:pjspaul_admin/view/widget/progressbar.dart';
 
 class OtherController extends GetxController{
+   RxBool isGo = true.obs;
   RxBool isShowAdd = false.obs;
   List<List<String>> list = [
     ["Location"],
@@ -18,24 +19,30 @@ class OtherController extends GetxController{
   RxList<List<String>> listData = <List<String>>[].obs;
 
   Future<void> getLifeChangingChurch() async {
+    isGo.value = false;
     listData.clear();
     final FirebaseFirestore firestore = FirebaseFirestore.instance;
     firestore.collection('life_changing_church').get().then((snapshot) {
+      listData.clear();
       snapshot.docs.forEach((doc) {
         var data = doc.data();
         listData.add([data["location"]]);
       });
+      isGo.value = true;
     });
   }
 
   Future<void> getPJSMinistries() async {
+    isGo.value = false;
     listData.clear();
     final FirebaseFirestore firestore = FirebaseFirestore.instance;
     firestore.collection('pjs_ministies').get().then((snapshot) {
+      listData.clear();
       snapshot.docs.forEach((doc) {
         var data = doc.data();
         listData.add([data["ministry_location"]]);
       });
+      isGo.value = true;
     });
   }
 
@@ -67,15 +74,18 @@ class OtherController extends GetxController{
   }
 
   Future<void> getLifeTVProgram() async {
+    isGo.value = false;
     listData.clear();
     final FirebaseFirestore firestore = FirebaseFirestore.instance;
     firestore.collection('life_tv_program').get().then((snapshot) {
+      listData.clear();
       snapshot.docs.forEach((doc) {
         var data = doc.data();
         listData.add([data["tv_program"], "delete"]);
         listId.add(doc.id);
       });
     });
+    isGo.value = true;
   }
 
   Future<void> deleteLifeTVProgram(BuildContext context, int index) async {
@@ -97,24 +107,30 @@ class OtherController extends GetxController{
 
 
   Future<void> getEmailAddress() async {
+    isGo.value = false;
     listData.clear();
     final FirebaseFirestore firestore = FirebaseFirestore.instance;
     firestore.collection('email').get().then((snapshot) {
+      listData.clear();
       snapshot.docs.forEach((doc) {
         var data = doc.data();
         listData.add([data["email"]]);
       });
+      isGo.value = true;
     });
   }
 
   Future<void> getDontation() async {
+    isGo.value = false;
     listData.clear();
     final FirebaseFirestore firestore = FirebaseFirestore.instance;
     firestore.collection('donation').get().then((snapshot) {
+      listData.clear();
       snapshot.docs.forEach((doc) {
         var data = doc.data();
         listData.add([data["donor_name"], data["contact"], data["amount"], "Razorpay"]);
       });
+      isGo.value = true;
     });
   }
 }

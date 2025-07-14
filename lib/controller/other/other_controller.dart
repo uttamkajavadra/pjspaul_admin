@@ -11,7 +11,7 @@ class OtherController extends GetxController{
     ["Location"],
     ["Location"],
     ["TV Program Name", "delete"],
-    ["Email Address"],
+    ["Name", "Email Address", "Phone", "Subject", "Message"],
     ["Donor Name", "Contact Number", "Donation Amount", "Payment Method"],
   ];
   RxInt selectedIndex = 0.obs;
@@ -114,7 +114,7 @@ class OtherController extends GetxController{
       listData.clear();
       snapshot.docs.forEach((doc) {
         var data = doc.data();
-        listData.add([data["email"]]);
+        listData.add([data["name"], data["email"], data["phone"], data["subject"], data["message"]]);
       });
       isGo.value = true;
     });

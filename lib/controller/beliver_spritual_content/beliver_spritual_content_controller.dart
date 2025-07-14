@@ -16,7 +16,7 @@ class BeliverSpritualContentController extends GetxController{
   List<List<String>> list = [
     [],
     ["Blessing Text", "Image Upload", "Video Upload", "Delete"],
-    ["Event Title", "Location", "Date and Time", "Description", "Delete"],
+    ["Event Title", "Location", "Date and Time", "Description", "Image Upload", "Video Upload", "Delete"],
     ["Title", "Message Content", "Delete"],
     ["Video Title", "Video Upload", "Delete"],
     ["Song Title", "Audio File", "Delete"],
@@ -211,15 +211,15 @@ Future<void> deleteTodayBlessing(BuildContext context, int index) async {
   Future<void> addUpcomingEvent(BuildContext context) async {
     try {
       ProgressBar.instance.showProgressbar(context);
-      // final storageRef = FirebaseStorage.instance.ref();
+      final storageRef = FirebaseStorage.instance.ref();
 
-      // final fileImageRef = storageRef.child('today_blessing/${DateTime.now().millisecondsSinceEpoch}.png');
-      // await fileImageRef.putData(selectedImageFile.value!);
-      // String imageUrl = await fileImageRef.getDownloadURL();
+      final fileImageRef = storageRef.child('upcoming_event/${DateTime.now().millisecondsSinceEpoch}.png');
+      await fileImageRef.putData(selectedImageFile.value!);
+      String imageUrl = await fileImageRef.getDownloadURL();
 
-      // final fileRef = storageRef.child('today_blessing/${DateTime.now().millisecondsSinceEpoch}.png');
-      // await fileRef.putData(selectedFile.value!);
-      // String videoUrl = await fileRef.getDownloadURL();
+      final fileRef = storageRef.child('upcoming_event/${DateTime.now().millisecondsSinceEpoch}.mp4');
+      await fileRef.putData(selectedFile.value!);
+      String videoUrl = await fileRef.getDownloadURL();
 
       CollectionReference request = firestore.collection('upcoming_event');
 
@@ -229,6 +229,8 @@ Future<void> deleteTodayBlessing(BuildContext context, int index) async {
         'time': formatTimeOfDay(selectedTime.value!, context),
         'location': locationController.text,
         'description': descriptionController.text,
+        'image': imageUrl,
+        'video': videoUrl,   
       });
       ProgressBar.instance.stopProgressBar(context);
       // Get.back();
@@ -244,6 +246,8 @@ Future<void> deleteTodayBlessing(BuildContext context, int index) async {
       descriptionController.clear();
       selectedDate = Rxn();
       selectedTime = Rxn();
+      selectedFile = Rxn();
+      selectedImageFile = Rxn();
       getUpcomingEvent();
     }
   }
@@ -259,7 +263,7 @@ Future<void> deleteTodayBlessing(BuildContext context, int index) async {
       snapshot.docs.forEach((doc) {
         var data = doc.data();
         listId.add(doc.id);
-        listData.add([data["event_title"], data["location"], "${data["date"]} ${data["time"]}", data["description"], "delete"]);
+        listData.add([data["event_title"], data["location"], "${data["date"]} ${data["time"]}", data["description"], data["image"], data["video"], "delete"]);
         
       });
       print("getUpcomingEvent");

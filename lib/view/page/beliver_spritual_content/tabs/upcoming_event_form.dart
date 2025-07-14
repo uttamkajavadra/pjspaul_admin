@@ -6,6 +6,8 @@ import 'package:pjspaul_admin/view/widget/custom_button.dart';
 import 'package:pjspaul_admin/view/widget/custom_date_picker.dart';
 import 'package:pjspaul_admin/view/widget/custom_text_form_field.dart';
 import 'package:pjspaul_admin/view/widget/custom_time_picker.dart';
+import 'package:pjspaul_admin/view/widget/custom_toast.dart';
+import 'package:pjspaul_admin/view/widget/custom_upload_file.dart';
 
 class UpcomingEventForm extends StatelessWidget {
   const UpcomingEventForm({super.key});
@@ -73,10 +75,40 @@ class UpcomingEventForm extends StatelessWidget {
                 const SizedBox(
             height: 20,
           ),
+          Obx(() {
+            return CustomUploadFile(
+              onTap: () {
+                controller.pickImageFile();
+              },
+              selectedFile: controller.selectedImageFile.value,
+              uploadText: "Upload Image",
+              selectedText: "Image Selected",
+            );
+          }),
+          const SizedBox(
+            height: 20,
+          ),
+          Obx(() {
+            return CustomUploadFile(
+              onTap: () {
+                controller.pickFile();
+              },
+              selectedFile: controller.selectedFile.value,
+              uploadText: "Upload Video",
+              selectedText: "Video Selected",
+            );
+          }),
+          const SizedBox(
+            height: 20,
+          ),
           CustomElevatedButton(
               onPressed: () {
                 if (controller.upcomingEventForm.currentState!.validate()) {
-                  controller.addUpcomingEvent(context);
+                  if (controller.selectedFile.value != null && controller.selectedImageFile.value != null) {
+                    controller.addUpcomingEvent(context);
+                  } else {
+                    CustomToast.instance.showMsg("Please fill all the details");
+                  }
                 }
               },
               buttonText: "ADD"),

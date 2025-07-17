@@ -4,6 +4,9 @@ import 'package:pjspaul_admin/controller/beliver_spritual_content/beliver_spritu
 import 'package:pjspaul_admin/utils/validator.dart';
 import 'package:pjspaul_admin/view/widget/custom_button.dart';
 import 'package:pjspaul_admin/view/widget/custom_text_form_field.dart';
+import 'package:pjspaul_admin/view/widget/custom_toast.dart';
+import 'package:pjspaul_admin/view/widget/custom_upload_file.dart';
+import 'package:pjspaul_admin/view/widget/custom_yes_no.dart';
 
 class ShortMessageForm extends StatelessWidget {
   const ShortMessageForm({super.key});
@@ -41,10 +44,44 @@ class ShortMessageForm extends StatelessWidget {
                 const SizedBox(
             height: 20,
           ),
+          Obx(
+            () {
+              return CustomYesNo(
+                isYoutube: controller.isYoutube.value, 
+                onTap: (status){
+                  controller.isYoutube.value = status;
+                  controller.youtubeVideoController.text = "";
+                });
+            }
+          ),
+          const SizedBox(height: 20,),
+          Obx(() {
+            if(controller.isYoutube.value){
+              return CustomTextFormField(
+              controller: controller.youtubeVideoController,
+              labelText: "Youtube Link",
+              validator: (value) => Validator.validateNull("Youtube Link", value));
+            }
+            return CustomUploadFile(
+              onTap: () {
+                controller.pickFile();
+              },
+              selectedFile: controller.selectedFile.value,
+              uploadText: "Upload Video",
+              selectedText: "Video Selected",
+            );
+          }),
+           const SizedBox(
+            height: 20,
+          ),
           CustomElevatedButton(
               onPressed: () {
                 if (controller.shortMessageForm.currentState!.validate()) {
-                  controller.addShortMessage(context);
+                  if (controller.youtubeVideoController.text.isNotEmpty || controller.selectedFile.value != null) {
+                    controller.addShortMessage(context);
+                  } else {
+                    CustomToast.instance.showMsg("Please fill all the details");
+                  }
                 }
               },
               buttonText: "ADD"),

@@ -6,6 +6,7 @@ import 'package:pjspaul_admin/view/widget/custom_button.dart';
 import 'package:pjspaul_admin/view/widget/custom_text_form_field.dart';
 import 'package:pjspaul_admin/view/widget/custom_toast.dart';
 import 'package:pjspaul_admin/view/widget/custom_upload_file.dart';
+import 'package:pjspaul_admin/view/widget/custom_yes_no.dart';
 
 class TodayBlessingForm extends StatelessWidget {
   const TodayBlessingForm({super.key});
@@ -43,7 +44,24 @@ class TodayBlessingForm extends StatelessWidget {
           const SizedBox(
             height: 20,
           ),
+          Obx(
+            () {
+              return CustomYesNo(
+                isYoutube: controller.isYoutube.value, 
+                onTap: (status){
+                  controller.isYoutube.value = status;
+                  controller.youtubeVideoController.text = "";
+                });
+            }
+          ),
+          const SizedBox(height: 20,),
           Obx(() {
+            if(controller.isYoutube.value){
+              return CustomTextFormField(
+              controller: controller.youtubeVideoController,
+              labelText: "Youtube Link",
+              validator: (value) => Validator.validateNull("Youtube Link", value));
+            }
             return CustomUploadFile(
               onTap: () {
                 controller.pickFile();
@@ -53,13 +71,14 @@ class TodayBlessingForm extends StatelessWidget {
               selectedText: "Video Selected",
             );
           }),
+          
           const SizedBox(
             height: 20,
           ),
           CustomElevatedButton(
               onPressed: () {
                 if (controller.blessingForm.currentState!.validate()) {
-                  if (controller.selectedFile.value != null && controller.selectedImageFile.value != null) {
+                  if ((controller.youtubeVideoController.text.isNotEmpty || controller.selectedFile.value != null) && controller.selectedImageFile.value != null) {
                     controller.addTodayBlessing(context);
                   } else {
                     CustomToast.instance.showMsg("Please fill all the details");

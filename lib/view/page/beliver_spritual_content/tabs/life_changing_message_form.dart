@@ -6,6 +6,7 @@ import 'package:pjspaul_admin/view/widget/custom_button.dart';
 import 'package:pjspaul_admin/view/widget/custom_text_form_field.dart';
 import 'package:pjspaul_admin/view/widget/custom_toast.dart';
 import 'package:pjspaul_admin/view/widget/custom_upload_file.dart';
+import 'package:pjspaul_admin/view/widget/custom_yes_no.dart';
 
 class LifeChangingMessageForm extends StatelessWidget {
   const LifeChangingMessageForm({super.key});
@@ -30,7 +31,24 @@ class LifeChangingMessageForm extends StatelessWidget {
           const SizedBox(
             height: 20,
           ),
+          Obx(
+            () {
+              return CustomYesNo(
+                isYoutube: controller.isYoutube.value, 
+                onTap: (status){
+                  controller.isYoutube.value = status;
+                  controller.youtubeVideoController.text = "";
+                });
+            }
+          ),
+          const SizedBox(height: 20,),
           Obx(() {
+            if(controller.isYoutube.value){
+              return CustomTextFormField(
+              controller: controller.youtubeVideoController,
+              labelText: "Youtube Link",
+              validator: (value) => Validator.validateNull("Youtube Link", value));
+            }
             return CustomUploadFile(
               onTap: () {
                 controller.pickFile();
@@ -46,7 +64,7 @@ class LifeChangingMessageForm extends StatelessWidget {
           CustomElevatedButton(
               onPressed: () {
                 if (controller.lifeMessgaeForm.currentState!.validate()) {
-                  if (controller.selectedFile.value != null) {
+                  if (controller.youtubeVideoController.text.isNotEmpty || controller.selectedFile.value != null) {
                     controller.addLifeMessage(context);
                   } else {
                     CustomToast.instance.showMsg("Please fill all the details");

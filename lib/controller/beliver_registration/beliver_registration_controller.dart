@@ -24,7 +24,7 @@ class BeliverRegistrationController extends GetxController{
       listData.clear();
       snapshot.docs.forEach((doc) {
         var data = doc.data();
-        listData.add([data["name"], data["location"], data["contact"], data["Age"], data["profession"]]);
+        listData.add([data["name"], data["location"], data["contact"], data["birth_date"], data["profession"]]);
       });
       isGo.value = true;
     });

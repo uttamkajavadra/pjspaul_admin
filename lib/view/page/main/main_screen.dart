@@ -36,7 +36,7 @@ class _MainScreenState extends State<MainScreen> {
     {"title": "Upload Image Screen", "screen": UploadImageScreen()},
     {"title": "Today's Blessing", "screen": BeliverSpritualContentScreen()},
     {"title": "Life Changing Radio 24x7", "screen": BeliverSpritualContentScreen()},
-    {"title": "Short Messages", "screen": BeliverSpritualContentScreen()},
+    {"title": "Life Changing Short Videos", "screen": BeliverSpritualContentScreen()},
     {"title": "Donations", "screen": OtherScreen()},
     {"title": "Life Changing Message Live", "screen": BeliverSpritualContentScreen()},
     {"title": "Connect With Us", "screen": OtherScreen()},
@@ -44,6 +44,7 @@ class _MainScreenState extends State<MainScreen> {
     {"title": "Upcoming Events", "screen": BeliverSpritualContentScreen()},
     {"title": "My Prayer Request", "screen": BeliverRequestFormScreen()},
     {"title": "My Testimonies", "screen": BeliverRequestFormScreen()},
+    {"title": "Pastor Appointment Request", "screen": BeliverRequestFormScreen()},
     {"title": "Suggest/Feedback", "screen": BeliverRequestFormScreen()},
     {"title": "Spiritual Guidance & Counselling Request", "screen": BeliverRequestFormScreen()},
     {"title": "Cottage Prayer/Hospital Visit Request", "screen": BeliverRequestFormScreen()},
@@ -117,28 +118,31 @@ class _MainScreenState extends State<MainScreen> {
                                 } else if (selectedIndex.value == 11) {
                                   beliverRequestFormController.selectedIndex.value = 1;
                                 } else if (selectedIndex.value == 12) {
-                                  beliverRequestFormController.selectedIndex.value = 4;
+                                  beliverRequestFormController.selectedIndex.value = 5;
                                 } else if (selectedIndex.value == 13) {
-                                  beliverRequestFormController.selectedIndex.value = 3;
+                                  beliverRequestFormController.selectedIndex.value = 4;
                                 } else if (selectedIndex.value == 14) {
-                                  beliverRequestFormController.selectedIndex.value = 2;
+                                  beliverRequestFormController.selectedIndex.value = 3;
                                 } else if (selectedIndex.value == 15) {
-                                  beliverRequestFormController.selectedIndex.value = 7;
+                                  beliverRequestFormController.selectedIndex.value = 2;
                                 } else if (selectedIndex.value == 16) {
-                                  beliverRegistrationController.selectedIndex.value = 0;
+                                  beliverRequestFormController.selectedIndex.value = 7;
                                 } else if (selectedIndex.value == 17) {
-                                  beliverRegistrationController.selectedIndex.value = 4;
+                                  beliverRegistrationController.selectedIndex.value = 0;
                                 } else if (selectedIndex.value == 18) {
-                                  beliverRegistrationController.selectedIndex.value = 6;
+                                  beliverRegistrationController.selectedIndex.value = 4;
                                 } else if (selectedIndex.value == 19) {
-                                  beliverRegistrationController.selectedIndex.value = 2;
+                                  beliverRegistrationController.selectedIndex.value = 6;
                                 } else if (selectedIndex.value == 20) {
-                                  beliverRegistrationController.selectedIndex.value = 1;
+                                  beliverRegistrationController.selectedIndex.value = 2;
                                 } else if (selectedIndex.value == 21) {
-                                  beliverRegistrationController.selectedIndex.value = 3;
+                                  beliverRegistrationController.selectedIndex.value = 1;
                                 } else if (selectedIndex.value == 22) {
+                                  beliverRegistrationController.selectedIndex.value = 3;
+                                } else if (selectedIndex.value == 23) {
                                   beliverRegistrationController.selectedIndex.value = 5;
                                 }
+                                print(selectedIndex.value );
                               }
                             },
                             child: Container(

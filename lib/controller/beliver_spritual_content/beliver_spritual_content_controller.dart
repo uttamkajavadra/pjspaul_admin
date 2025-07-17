@@ -17,7 +17,7 @@ class BeliverSpritualContentController extends GetxController{
     [],
     ["Blessing Text", "Image Upload", "Video Upload", "Delete"],
     ["Event Title", "Location", "Date and Time", "Description", "Image Upload", "Video Upload", "Delete"],
-    ["Title", "Message Content", "Delete"],
+    ["Title", "Message Content", "Video", "Delete"],
     ["Video Title", "Video Upload", "Delete"],
     ["Song Title", "Audio File", "Delete"],
   ];
@@ -124,19 +124,26 @@ class BeliverSpritualContentController extends GetxController{
 
   final blessingForm = GlobalKey<FormState>();
   final TextEditingController blessingController = TextEditingController();
+  final TextEditingController youtubeVideoController = TextEditingController();
+  RxBool isYoutube = false.obs;
   Future<void> addTodayBlessing(BuildContext context) async {
     try {
       ProgressBar.instance.showProgressbar(context);
+      String imageUrl = "";
+      String videoUrl = "";
       final storageRef = FirebaseStorage.instance.ref();
 
       final fileImageRef = storageRef.child('today_blessing/${DateTime.now().millisecondsSinceEpoch}.png');
       await fileImageRef.putData(selectedImageFile.value!);
-      String imageUrl = await fileImageRef.getDownloadURL();
-
-      final fileRef = storageRef.child('today_blessing/${DateTime.now().millisecondsSinceEpoch}.mp4');
-      await fileRef.putData(selectedFile.value!);
-      String videoUrl = await fileRef.getDownloadURL();
-
+      imageUrl = await fileImageRef.getDownloadURL();
+      if(youtubeVideoController.text.isEmpty){
+        final fileRef = storageRef.child('today_blessing/${DateTime.now().millisecondsSinceEpoch}.mp4');
+        await fileRef.putData(selectedFile.value!);
+        videoUrl = await fileRef.getDownloadURL();
+      } else {
+        videoUrl = youtubeVideoController.text;
+      }
+      
       CollectionReference request = firestore.collection('today_blessing');
 
       await request.add({
@@ -156,6 +163,7 @@ class BeliverSpritualContentController extends GetxController{
       blessingController.clear();
       selectedFile = Rxn();
       selectedImageFile = Rxn();
+      youtubeVideoController.text = "";
       getTodayBlessing();
     }
   }
@@ -295,21 +303,26 @@ Future<void> deleteTodayBlessing(BuildContext context, int index) async {
   Future<void> addShortMessage(BuildContext context) async {
     try {
       ProgressBar.instance.showProgressbar(context);
-      // final storageRef = FirebaseStorage.instance.ref();
+      final storageRef = FirebaseStorage.instance.ref();
 
       // final fileImageRef = storageRef.child('today_blessing/${DateTime.now().millisecondsSinceEpoch}.png');
       // await fileImageRef.putData(selectedImageFile.value!);
       // String imageUrl = await fileImageRef.getDownloadURL();
-
-      // final fileRef = storageRef.child('today_blessing/${DateTime.now().millisecondsSinceEpoch}.png');
-      // await fileRef.putData(selectedFile.value!);
-      // String videoUrl = await fileRef.getDownloadURL();
+      String? videoUrl = "";
+      if(youtubeVideoController.text.isEmpty){
+        final fileRef = storageRef.child('short_video/${DateTime.now().millisecondsSinceEpoch}.mp4');
+        await fileRef.putData(selectedFile.value!);
+        videoUrl = await fileRef.getDownloadURL();
+      } else {
+        videoUrl = youtubeVideoController.text;
+      }
 
       CollectionReference request = firestore.collection('short_message');
 
       await request.add({
         'title': shortController.text,
         'message': messageController.text,
+        'video': videoUrl
       });
       ProgressBar.instance.stopProgressBar(context);
       // Get.back();
@@ -322,6 +335,8 @@ Future<void> deleteTodayBlessing(BuildContext context, int index) async {
     } finally{
       shortController.clear();
       messageController.clear();
+      selectedFile = Rxn();
+      youtubeVideoController.text = "";
       getShortMessage();
     }
   }
@@ -337,7 +352,7 @@ Future<void> deleteTodayBlessing(BuildContext context, int index) async {
       snapshot.docs.forEach((doc) {
         var data = doc.data();
         listId.add(doc.id);
-        listData.add([data["title"], data["message"], "delete"]);
+        listData.add([data["title"], data["message"], data["video"], "delete"]);
       });
       print("getShortMessage");
         isGo.value = true;
@@ -371,10 +386,14 @@ Future<void> deleteTodayBlessing(BuildContext context, int index) async {
       // final fileImageRef = storageRef.child('today_blessing/${DateTime.now().millisecondsSinceEpoch}.png');
       // await fileImageRef.putData(selectedImageFile.value!);
       // String imageUrl = await fileImageRef.getDownloadURL();
-
-      final fileRef = storageRef.child('life_message/${DateTime.now().millisecondsSinceEpoch}.mp4');
-      await fileRef.putData(selectedFile.value!);
-      String videoUrl = await fileRef.getDownloadURL();
+      String videoUrl = "";
+      if(youtubeVideoController.text.isEmpty){
+        final fileRef = storageRef.child('life_message/${DateTime.now().millisecondsSinceEpoch}.mp4');
+        await fileRef.putData(selectedFile.value!);
+        videoUrl = await fileRef.getDownloadURL();
+      } else {
+        videoUrl = youtubeVideoController.text;
+      }
 
       CollectionReference request = firestore.collection('life_message');
 
@@ -393,6 +412,7 @@ Future<void> deleteTodayBlessing(BuildContext context, int index) async {
     } finally{
       videoTitleController.clear();
       selectedFile = Rxn();
+      youtubeVideoController.text = "";
       getLifeMessage();
     }
   }

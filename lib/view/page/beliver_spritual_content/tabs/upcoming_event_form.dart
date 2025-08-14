@@ -104,11 +104,11 @@ class UpcomingEventForm extends StatelessWidget {
           CustomElevatedButton(
               onPressed: () {
                 if (controller.upcomingEventForm.currentState!.validate()) {
-                  if (controller.selectedFile.value != null && controller.selectedImageFile.value != null) {
+                  // if (controller.selectedFile.value != null && controller.selectedImageFile.value != null) {
                     controller.addUpcomingEvent(context);
-                  } else {
-                    CustomToast.instance.showMsg("Please fill all the details");
-                  }
+                  // } else {
+                  //   CustomToast.instance.showMsg("Please fill all the details");
+                  // }
                 }
               },
               buttonText: "ADD"),

@@ -10,7 +10,7 @@ class BeliverRegistrationController extends GetxController{
     ["Full Name", "Contact Number", "Complete Address", "Business Name", "Industry"],
     ["Full Name", "Contact Number", "Complete Address", "Gender", "Attending Church Since"],
     ["Full Name", "Profession", "Speciality", "Contact Number", "Working Organization"],
-    ["Full Name", "Location", "Contact Number", "Gender", "Prayer  Slot Preference"],
+    ["Full Name", "Location", "Contact Number", "Gender", "Days", "Prayer  Slot Preference"],
   ];
   RxInt selectedIndex = 0.obs;
 
@@ -108,7 +108,7 @@ class BeliverRegistrationController extends GetxController{
       listData.clear();
       snapshot.docs.forEach((doc) {
         var data = doc.data();
-        listData.add([data["name"], data["address"], data["contact"], data["gender"], data["prayer_slot"]]);
+        listData.add([data["name"], data["address"], data["contact"], data["gender"], data["days"] ?? "", data["prayer_slot"]]);
       });
       isGo.value = true;
     });

@@ -58,7 +58,7 @@ class BeliverSpritualContentController extends GetxController{
       Uint8List? file = result.files.single.bytes;
 
       // Validate file size (2 MB = 2 * 1024 * 1024 bytes)
-      if (file!.length <= 2 * 1024 * 1024) {
+      if (file!.length <= 10 * 1024 * 1024) {
           selectedFile.value = file;
       } else {
           selectedFile.value = null;
@@ -220,14 +220,25 @@ Future<void> deleteTodayBlessing(BuildContext context, int index) async {
     try {
       ProgressBar.instance.showProgressbar(context);
       final storageRef = FirebaseStorage.instance.ref();
+       String imageUrl = "";
+      if(selectedImageFile.value != null){
+        final fileImageRef = storageRef.child('upcoming_event/${DateTime.now().millisecondsSinceEpoch}.png');
+         await fileImageRef.putData(selectedImageFile.value!);
+         imageUrl = await fileImageRef.getDownloadURL();
+      }
+      // final fileImageRef = storageRef.child('upcoming_event/${DateTime.now().millisecondsSinceEpoch}.png');
+      // await fileImageRef.putData(selectedImageFile.value!);
+      // String imageUrl = await fileImageRef.getDownloadURL();
 
-      final fileImageRef = storageRef.child('upcoming_event/${DateTime.now().millisecondsSinceEpoch}.png');
-      await fileImageRef.putData(selectedImageFile.value!);
-      String imageUrl = await fileImageRef.getDownloadURL();
-
-      final fileRef = storageRef.child('upcoming_event/${DateTime.now().millisecondsSinceEpoch}.mp4');
-      await fileRef.putData(selectedFile.value!);
-      String videoUrl = await fileRef.getDownloadURL();
+      String videoUrl = "";
+      if(selectedFile.value != null){
+        final fileRef = storageRef.child('upcoming_event/${DateTime.now().millisecondsSinceEpoch}.mp4');
+        await fileRef.putData(selectedFile.value!);
+        videoUrl = await fileRef.getDownloadURL();
+      }
+      // final fileRef = storageRef.child('upcoming_event/${DateTime.now().millisecondsSinceEpoch}.mp4');
+      // await fileRef.putData(selectedFile.value!);
+      // String videoUrl = await fileRef.getDownloadURL();
 
       CollectionReference request = firestore.collection('upcoming_event');
 

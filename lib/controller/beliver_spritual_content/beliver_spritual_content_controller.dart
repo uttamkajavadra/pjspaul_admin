@@ -58,12 +58,12 @@ class BeliverSpritualContentController extends GetxController{
       Uint8List? file = result.files.single.bytes;
 
       // Validate file size (2 MB = 2 * 1024 * 1024 bytes)
-      if (file!.length <= 10 * 1024 * 1024) {
+      // if (file!.length <= 10 * 1024 * 1024) {
           selectedFile.value = file;
-      } else {
-          selectedFile.value = null;
-          CustomToast.instance.showMsg("File is more than 2 MB");
-      }
+      // } else {
+      //     selectedFile.value = null;
+      //     CustomToast.instance.showMsg("File is more than 2 MB");
+      // }
     }
   }
 

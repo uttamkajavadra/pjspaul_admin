@@ -36,6 +36,16 @@ class FirebaseStorageHelper {
     }
   }
 
+  /// Deletes a file using its download URL.
+  static Future<void> deleteFileByUrl(String? url) async {
+    if (url == null || url.isEmpty) return;
+    try {
+      await _storage.refFromURL(url).delete();
+    } catch (_) {
+      // File may already be deleted or URL invalid — ignore
+    }
+  }
+
   /// Gets the download URL for a storage path.
   static Future<String> getDownloadUrl(String storagePath) async {
     return await _storage.ref().child(storagePath).getDownloadURL();

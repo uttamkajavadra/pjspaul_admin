@@ -70,18 +70,21 @@ class UploadImageController extends GetxController {
   RxList<Map<String, dynamic>> imageList = <Map<String, dynamic>>[].obs;
 
   Future<void> getImage() async {
-    imageList.clear();
-    listId.clear();
+    List<Map<String, dynamic>> tempList = [];
+    List<String> tempIds = [];
+
     firestore.collection('upload_image').get().then((snapshot) {
       for (var doc in snapshot.docs) {
         var data = doc.data();
-        listId.add(doc.id);
-        imageList.add({
+        tempIds.add(doc.id);
+        tempList.add({
           'image': data['image'] ?? '',
           'storage_path': data['storage_path'] ?? '',
           'created_at': _formatDate(data['created_at']),
         });
       }
+      listId.assignAll(tempIds);
+      imageList.assignAll(tempList);
     });
   }
 
@@ -89,11 +92,20 @@ class UploadImageController extends GetxController {
     try {
       ProgressBar.instance.showProgressbar(context);
       // Delete from Firebase Storage
-      final doc =
-          await firestore.collection('upload_image').doc(listId[index]).get();
-      if (doc.exists) {
-        await FirebaseStorageHelper.deleteFile(doc.data()?['storage_path']);
+      if (index < imageList.length) {
+        final item = imageList[index];
+        String? storagePath = item['storage_path'];
+        String? imageUrl = item['image'];
+
+        if (storagePath != null && storagePath.isNotEmpty) {
+          await FirebaseStorageHelper.deleteFile(storagePath);
+        } else if (imageUrl != null &&
+            imageUrl.isNotEmpty &&
+            imageUrl.startsWith('http')) {
+          await FirebaseStorageHelper.deleteFileByUrl(imageUrl);
+        }
       }
+
       // Delete from Firestore
       await firestore.collection('upload_image').doc(listId[index]).delete();
       ProgressBar.instance.stopProgressBar(context);

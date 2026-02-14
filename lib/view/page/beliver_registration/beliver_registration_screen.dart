@@ -22,11 +22,11 @@ class _BeliverRegistrationScreenState extends State<BeliverRegistrationScreen> {
   @override
   void initState() {
     super.initState();
+    controller.refreshCurrent();
   }
 
   @override
   Widget build(BuildContext context) {
-    controller.refreshCurrent();
     return Scaffold(
       backgroundColor: Colors.white,
       body: SingleChildScrollView(

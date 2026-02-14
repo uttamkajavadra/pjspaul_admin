@@ -22,11 +22,11 @@ class _OtherScreenState extends State<OtherScreen> {
   @override
   void initState() {
     super.initState();
+    controller.refreshCurrent();
   }
 
   @override
   Widget build(BuildContext context) {
-    controller.refreshCurrent();
     return Scaffold(
       backgroundColor: Colors.white,
       body: Column(

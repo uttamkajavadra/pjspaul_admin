@@ -95,18 +95,22 @@ class BeliverRegistrationController extends GetxController {
   // Helper to fetch data with date and doc IDs
   Future<void> _fetchCollection(String collection, List<String> fields) async {
     isGo.value = false;
-    listData.clear();
-    listId.clear();
+    List<List<String>> tempData = [];
+    List<String> tempIds = [];
+
     final snapshot =
         await FirebaseFirestore.instance.collection(collection).get();
     for (var doc in snapshot.docs) {
       var data = doc.data();
-      listId.add(doc.id);
+      tempIds.add(doc.id);
       List<String> row = fields.map((f) => (data[f] ?? '').toString()).toList();
       row.add(_formatDate(data['created_at']));
       row.add('delete');
-      listData.add(row);
+      tempData.add(row);
     }
+
+    listId.assignAll(tempIds);
+    listData.assignAll(tempData);
     isGo.value = true;
   }
 

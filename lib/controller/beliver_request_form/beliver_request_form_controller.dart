@@ -93,22 +93,27 @@ class BeliverRequestFormController extends GetxController {
   Future<void> _fetchCollection(String collection, List<String> fields,
       {bool hasFile = false}) async {
     isGo.value = false;
-    listData.clear();
-    listId.clear();
-    listMeta.clear();
+    List<List<String>> tempData = [];
+    List<String> tempIds = [];
+    List<Map<String, String>> tempMeta = [];
+
     final snapshot =
         await FirebaseFirestore.instance.collection(collection).get();
     for (var doc in snapshot.docs) {
       var data = doc.data();
-      listId.add(doc.id);
+      tempIds.add(doc.id);
       List<String> row = fields.map((f) => (data[f] ?? '').toString()).toList();
       row.add(_formatDate(data['created_at']));
       row.add('delete');
-      listData.add(row);
-      listMeta.add({
+      tempData.add(row);
+      tempMeta.add({
         if (hasFile) 'image_storage_path': data['image_storage_path'] ?? '',
       });
     }
+
+    listId.assignAll(tempIds);
+    listMeta.assignAll(tempMeta);
+    listData.assignAll(tempData);
     isGo.value = true;
   }
 
@@ -130,14 +135,24 @@ class BeliverRequestFormController extends GetxController {
     try {
       ProgressBar.instance.showProgressbar(context);
       // Clean up storage files if applicable
+      // Clean up storage files if applicable
       if (hasFile) {
-        final doc = await FirebaseFirestore.instance
-            .collection(collection)
-            .doc(listId[index])
-            .get();
-        if (doc.exists) {
-          await FirebaseStorageHelper.deleteFile(
-              doc.data()?['image_storage_path']);
+        String? storagePath;
+        if (index < listMeta.length &&
+            listMeta[index].containsKey('image_storage_path')) {
+          storagePath = listMeta[index]['image_storage_path'];
+        }
+
+        if (storagePath != null && storagePath.isNotEmpty) {
+          await FirebaseStorageHelper.deleteFile(storagePath);
+        } else {
+          // Fallback: Try deleting by URL if storage path is missing
+          if (index < listData.length && listData[index].length > 4) {
+            String url = listData[index][4];
+            if (url.startsWith('http')) {
+              await FirebaseStorageHelper.deleteFileByUrl(url);
+            }
+          }
         }
       }
       await FirebaseFirestore.instance

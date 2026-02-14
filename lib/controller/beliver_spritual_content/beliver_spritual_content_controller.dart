@@ -105,19 +105,19 @@ class BeliverSpritualContentController extends GetxController {
 
   Future<void> getRadioLink() async {
     isGo.value = false;
-    listData.clear();
-    listId.clear();
-    listMeta.clear();
-    firestore.collection('radio').get().then((snapshot) {
-      listData.clear();
-      listId.clear();
-      for (var doc in snapshot.docs) {
-        var data = doc.data();
-        listId.add(doc.id);
-        listData.add([data["link"] ?? '']);
-      }
-      isGo.value = true;
-    });
+    List<List<String>> tempData = [];
+    List<String> tempIds = [];
+
+    final snapshot = await firestore.collection('radio').get();
+    for (var doc in snapshot.docs) {
+      var data = doc.data();
+      tempIds.add(doc.id);
+      tempData.add([data["link"] ?? '']);
+    }
+
+    listId.assignAll(tempIds);
+    listData.assignAll(tempData);
+    isGo.value = true;
   }
 
   // ──────────────── TODAY'S BLESSING ────────────────
@@ -182,46 +182,61 @@ class BeliverSpritualContentController extends GetxController {
 
   Future<void> getTodayBlessing() async {
     isGo.value = false;
-    listData.clear();
-    listId.clear();
-    listMeta.clear();
-    firestore.collection('today_blessing').get().then((snapshot) {
-      listData.clear();
-      listId.clear();
-      listMeta.clear();
-      for (var doc in snapshot.docs) {
-        var data = doc.data();
-        listId.add(doc.id);
-        listData.add([
-          data["blessing"] ?? '',
-          data["image"] ?? '',
-          data["video"] ?? '',
-          _formatDate(data["created_at"]),
-          "delete",
-        ]);
-        listMeta.add({
-          'video_type': data['video_type'] ?? '',
-          'image_storage_path': data['image_storage_path'] ?? '',
-          'video_storage_path': data['video_storage_path'] ?? '',
-        });
-      }
-      isGo.value = true;
-    });
+    List<List<String>> tempData = [];
+    List<String> tempIds = [];
+    List<Map<String, String>> tempMeta = [];
+
+    final snapshot = await firestore.collection('today_blessing').get();
+    for (var doc in snapshot.docs) {
+      var data = doc.data();
+      tempIds.add(doc.id);
+      tempData.add([
+        data["blessing"] ?? '',
+        data["image"] ?? '',
+        data["video"] ?? '',
+        _formatDate(data["created_at"]),
+        "delete",
+      ]);
+      tempMeta.add({
+        'video_type': data['video_type'] ?? '',
+        'image_storage_path': data['image_storage_path'] ?? '',
+        'video_storage_path': data['video_storage_path'] ?? '',
+      });
+    }
+
+    listId.assignAll(tempIds);
+    listMeta.assignAll(tempMeta);
+    listData.assignAll(tempData);
+    isGo.value = true;
   }
 
   Future<void> deleteTodayBlessing(BuildContext context, int index) async {
     try {
       ProgressBar.instance.showProgressbar(context);
       // Delete storage files
-      final doc =
-          await firestore.collection('today_blessing').doc(listId[index]).get();
-      if (doc.exists) {
-        final data = doc.data()!;
-        await FirebaseStorageHelper.deleteFile(data['image_storage_path']);
-        if (data['video_type'] != 'youtube') {
-          await FirebaseStorageHelper.deleteFile(data['video_storage_path']);
+      if (index < listMeta.length) {
+        final meta = listMeta[index];
+        final data = listData[index];
+
+        // Delete Image
+        String? imgPath = meta['image_storage_path'];
+        if (imgPath != null && imgPath.isNotEmpty) {
+          await FirebaseStorageHelper.deleteFile(imgPath);
+        } else if (data.length > 1 && data[1].startsWith('http')) {
+          await FirebaseStorageHelper.deleteFileByUrl(data[1]);
+        }
+
+        // Delete Video
+        if (meta['video_type'] != 'youtube') {
+          String? vidPath = meta['video_storage_path'];
+          if (vidPath != null && vidPath.isNotEmpty) {
+            await FirebaseStorageHelper.deleteFile(vidPath);
+          } else if (data.length > 2 && data[2].startsWith('http')) {
+            await FirebaseStorageHelper.deleteFileByUrl(data[2]);
+          }
         }
       }
+
       await firestore.collection('today_blessing').doc(listId[index]).delete();
       ProgressBar.instance.stopProgressBar(context);
       CustomToast.instance.showMsg("Delete successfully");
@@ -309,46 +324,64 @@ class BeliverSpritualContentController extends GetxController {
 
   Future<void> getUpcomingEvent() async {
     isGo.value = false;
-    listData.clear();
-    listId.clear();
-    listMeta.clear();
-    firestore.collection('upcoming_event').get().then((snapshot) {
-      listData.clear();
-      listId.clear();
-      listMeta.clear();
-      for (var doc in snapshot.docs) {
-        var data = doc.data();
-        listId.add(doc.id);
-        listData.add([
-          data["event_title"] ?? '',
-          data["location"] ?? '',
-          "${data["date"] ?? ''} ${data["time"] ?? ''}",
-          data["description"] ?? '',
-          data["image"] ?? '',
-          data["video"] ?? '',
-          _formatDate(data["created_at"]),
-          "delete",
-        ]);
-        listMeta.add({
-          'video_type': data['video_type'] ?? 'upload',
-          'image_storage_path': data['image_storage_path'] ?? '',
-          'video_storage_path': data['video_storage_path'] ?? '',
-        });
-      }
-      isGo.value = true;
-    });
+    List<List<String>> tempData = [];
+    List<String> tempIds = [];
+    List<Map<String, String>> tempMeta = [];
+
+    final snapshot = await firestore.collection('upcoming_event').get();
+    for (var doc in snapshot.docs) {
+      var data = doc.data();
+      tempIds.add(doc.id);
+      tempData.add([
+        data["event_title"] ?? '',
+        data["location"] ?? '',
+        "${data["date"] ?? ''} ${data["time"] ?? ''}",
+        data["description"] ?? '',
+        data["image"] ?? '',
+        data["video"] ?? '',
+        _formatDate(data["created_at"]),
+        "delete",
+      ]);
+      tempMeta.add({
+        'video_type': data['video_type'] ?? 'upload',
+        'image_storage_path': data['image_storage_path'] ?? '',
+        'video_storage_path': data['video_storage_path'] ?? '',
+      });
+    }
+
+    listId.assignAll(tempIds);
+    listMeta.assignAll(tempMeta);
+    listData.assignAll(tempData);
+    isGo.value = true;
   }
 
   Future<void> deleteUpcomingEvent(BuildContext context, int index) async {
     try {
       ProgressBar.instance.showProgressbar(context);
-      final doc =
-          await firestore.collection('upcoming_event').doc(listId[index]).get();
-      if (doc.exists) {
-        final data = doc.data()!;
-        await FirebaseStorageHelper.deleteFile(data['image_storage_path']);
-        await FirebaseStorageHelper.deleteFile(data['video_storage_path']);
+
+      if (index < listMeta.length) {
+        final meta = listMeta[index];
+        final data = listData[index];
+
+        // Delete Image
+        String? imgPath = meta['image_storage_path'];
+        if (imgPath != null && imgPath.isNotEmpty) {
+          await FirebaseStorageHelper.deleteFile(imgPath);
+        } else if (data.length > 4 && data[4].startsWith('http')) {
+          await FirebaseStorageHelper.deleteFileByUrl(data[4]);
+        }
+
+        // Delete Video
+        if (meta['video_type'] != 'youtube') {
+          String? vidPath = meta['video_storage_path'];
+          if (vidPath != null && vidPath.isNotEmpty) {
+            await FirebaseStorageHelper.deleteFile(vidPath);
+          } else if (data.length > 5 && data[5].startsWith('http')) {
+            await FirebaseStorageHelper.deleteFileByUrl(data[5]);
+          }
+        }
       }
+
       await firestore.collection('upcoming_event').doc(listId[index]).delete();
       ProgressBar.instance.stopProgressBar(context);
       CustomToast.instance.showMsg("Delete successfully");
@@ -412,43 +445,51 @@ class BeliverSpritualContentController extends GetxController {
 
   Future<void> getShortMessage() async {
     isGo.value = false;
-    listData.clear();
-    listId.clear();
-    listMeta.clear();
-    firestore.collection('short_message').get().then((snapshot) {
-      listData.clear();
-      listId.clear();
-      listMeta.clear();
-      for (var doc in snapshot.docs) {
-        var data = doc.data();
-        listId.add(doc.id);
-        listData.add([
-          data["title"] ?? '',
-          data["message"] ?? '',
-          data["video"] ?? '',
-          _formatDate(data["created_at"]),
-          "delete",
-        ]);
-        listMeta.add({
-          'video_type': data['video_type'] ?? '',
-          'video_storage_path': data['video_storage_path'] ?? '',
-        });
-      }
-      isGo.value = true;
-    });
+    List<List<String>> tempData = [];
+    List<String> tempIds = [];
+    List<Map<String, String>> tempMeta = [];
+
+    final snapshot = await firestore.collection('short_message').get();
+    for (var doc in snapshot.docs) {
+      var data = doc.data();
+      tempIds.add(doc.id);
+      tempData.add([
+        data["title"] ?? '',
+        data["message"] ?? '',
+        data["video"] ?? '',
+        _formatDate(data["created_at"]),
+        "delete",
+      ]);
+      tempMeta.add({
+        'video_type': data['video_type'] ?? '',
+        'video_storage_path': data['video_storage_path'] ?? '',
+      });
+    }
+
+    listId.assignAll(tempIds);
+    listMeta.assignAll(tempMeta);
+    listData.assignAll(tempData);
+    isGo.value = true;
   }
 
   Future<void> deleteShortMessage(BuildContext context, int index) async {
     try {
       ProgressBar.instance.showProgressbar(context);
-      final doc =
-          await firestore.collection('short_message').doc(listId[index]).get();
-      if (doc.exists) {
-        final data = doc.data()!;
-        if (data['video_type'] != 'youtube') {
-          await FirebaseStorageHelper.deleteFile(data['video_storage_path']);
+
+      if (index < listMeta.length) {
+        final meta = listMeta[index];
+        final data = listData[index];
+
+        if (meta['video_type'] != 'youtube') {
+          String? vidPath = meta['video_storage_path'];
+          if (vidPath != null && vidPath.isNotEmpty) {
+            await FirebaseStorageHelper.deleteFile(vidPath);
+          } else if (data.length > 2 && data[2].startsWith('http')) {
+            await FirebaseStorageHelper.deleteFileByUrl(data[2]);
+          }
         }
       }
+
       await firestore.collection('short_message').doc(listId[index]).delete();
       ProgressBar.instance.stopProgressBar(context);
       CustomToast.instance.showMsg("Delete successfully");
@@ -509,42 +550,50 @@ class BeliverSpritualContentController extends GetxController {
 
   Future<void> getLifeMessage() async {
     isGo.value = false;
-    listData.clear();
-    listId.clear();
-    listMeta.clear();
-    firestore.collection('life_message').get().then((snapshot) {
-      listData.clear();
-      listId.clear();
-      listMeta.clear();
-      for (var doc in snapshot.docs) {
-        var data = doc.data();
-        listId.add(doc.id);
-        listData.add([
-          data["title"] ?? '',
-          data["video"] ?? '',
-          _formatDate(data["created_at"]),
-          "delete",
-        ]);
-        listMeta.add({
-          'video_type': data['video_type'] ?? '',
-          'video_storage_path': data['video_storage_path'] ?? '',
-        });
-      }
-      isGo.value = true;
-    });
+    List<List<String>> tempData = [];
+    List<String> tempIds = [];
+    List<Map<String, String>> tempMeta = [];
+
+    final snapshot = await firestore.collection('life_message').get();
+    for (var doc in snapshot.docs) {
+      var data = doc.data();
+      tempIds.add(doc.id);
+      tempData.add([
+        data["title"] ?? '',
+        data["video"] ?? '',
+        _formatDate(data["created_at"]),
+        "delete",
+      ]);
+      tempMeta.add({
+        'video_type': data['video_type'] ?? '',
+        'video_storage_path': data['video_storage_path'] ?? '',
+      });
+    }
+
+    listId.assignAll(tempIds);
+    listMeta.assignAll(tempMeta);
+    listData.assignAll(tempData);
+    isGo.value = true;
   }
 
   Future<void> deleteLifeMessage(BuildContext context, int index) async {
     try {
       ProgressBar.instance.showProgressbar(context);
-      final doc =
-          await firestore.collection('life_message').doc(listId[index]).get();
-      if (doc.exists) {
-        final data = doc.data()!;
-        if (data['video_type'] != 'youtube') {
-          await FirebaseStorageHelper.deleteFile(data['video_storage_path']);
+
+      if (index < listMeta.length) {
+        final meta = listMeta[index];
+        final data = listData[index];
+
+        if (meta['video_type'] != 'youtube') {
+          String? vidPath = meta['video_storage_path'];
+          if (vidPath != null && vidPath.isNotEmpty) {
+            await FirebaseStorageHelper.deleteFile(vidPath);
+          } else if (data.length > 1 && data[1].startsWith('http')) {
+            await FirebaseStorageHelper.deleteFileByUrl(data[1]);
+          }
         }
       }
+
       await firestore.collection('life_message').doc(listId[index]).delete();
       ProgressBar.instance.stopProgressBar(context);
       CustomToast.instance.showMsg("Delete successfully");
@@ -592,39 +641,47 @@ class BeliverSpritualContentController extends GetxController {
 
   Future<void> getLifeSong() async {
     isGo.value = false;
-    listData.clear();
-    listId.clear();
-    listMeta.clear();
-    firestore.collection('life_song').get().then((snapshot) {
-      listData.clear();
-      listId.clear();
-      listMeta.clear();
-      for (var doc in snapshot.docs) {
-        var data = doc.data();
-        listId.add(doc.id);
-        listData.add([
-          data["title"] ?? '',
-          data["audio"] ?? '',
-          _formatDate(data["created_at"]),
-          "delete",
-        ]);
-        listMeta.add({
-          'audio_storage_path': data['audio_storage_path'] ?? '',
-        });
-      }
-      isGo.value = true;
-    });
+    List<List<String>> tempData = [];
+    List<String> tempIds = [];
+    List<Map<String, String>> tempMeta = [];
+
+    final snapshot = await firestore.collection('life_song').get();
+    for (var doc in snapshot.docs) {
+      var data = doc.data();
+      tempIds.add(doc.id);
+      tempData.add([
+        data["title"] ?? '',
+        data["audio"] ?? '',
+        _formatDate(data["created_at"]),
+        "delete",
+      ]);
+      tempMeta.add({
+        'audio_storage_path': data['audio_storage_path'] ?? '',
+      });
+    }
+
+    listId.assignAll(tempIds);
+    listMeta.assignAll(tempMeta);
+    listData.assignAll(tempData);
+    isGo.value = true;
   }
 
   Future<void> deleteLifeSong(BuildContext context, int index) async {
     try {
       ProgressBar.instance.showProgressbar(context);
-      final doc =
-          await firestore.collection('life_song').doc(listId[index]).get();
-      if (doc.exists) {
-        final data = doc.data()!;
-        await FirebaseStorageHelper.deleteFile(data['audio_storage_path']);
+
+      if (index < listMeta.length) {
+        final meta = listMeta[index];
+        final data = listData[index];
+
+        String? audioPath = meta['audio_storage_path'];
+        if (audioPath != null && audioPath.isNotEmpty) {
+          await FirebaseStorageHelper.deleteFile(audioPath);
+        } else if (data.length > 1 && data[1].startsWith('http')) {
+          await FirebaseStorageHelper.deleteFileByUrl(data[1]);
+        }
       }
+
       await firestore.collection('life_song').doc(listId[index]).delete();
       ProgressBar.instance.stopProgressBar(context);
       CustomToast.instance.showMsg("Delete successfully");

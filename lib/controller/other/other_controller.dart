@@ -106,65 +106,78 @@ class OtherController extends GetxController {
 
   Future<void> getLifeChangingChurch() async {
     isGo.value = false;
-    listData.clear();
-    listId.clear();
+    List<List<String>> tempData = [];
+    List<String> tempIds = [];
+
     final snapshot = await FirebaseFirestore.instance
         .collection('life_changing_church')
         .get();
     for (var doc in snapshot.docs) {
       var data = doc.data();
-      listId.add(doc.id);
-      listData.add(
+      tempIds.add(doc.id);
+      tempData.add(
           [data["location"] ?? '', _formatDate(data["created_at"]), 'delete']);
     }
+
+    listId.assignAll(tempIds);
+    listData.assignAll(tempData);
     isGo.value = true;
   }
 
   Future<void> getPJSMinistries() async {
     isGo.value = false;
-    listData.clear();
-    listId.clear();
+    List<List<String>> tempData = [];
+    List<String> tempIds = [];
+
     final snapshot =
         await FirebaseFirestore.instance.collection('pjs_ministies').get();
     for (var doc in snapshot.docs) {
       var data = doc.data();
-      listId.add(doc.id);
-      listData.add([
+      tempIds.add(doc.id);
+      tempData.add([
         data["ministry_location"] ?? '',
         _formatDate(data["created_at"]),
         'delete'
       ]);
     }
+
+    listId.assignAll(tempIds);
+    listData.assignAll(tempData);
     isGo.value = true;
   }
 
   Future<void> getLifeTVProgram() async {
     isGo.value = false;
-    listData.clear();
-    listId.clear();
+    List<List<String>> tempData = [];
+    List<String> tempIds = [];
+
     final snapshot =
         await FirebaseFirestore.instance.collection('life_tv_program').get();
     for (var doc in snapshot.docs) {
       var data = doc.data();
-      listId.add(doc.id);
-      listData.add([
+      tempIds.add(doc.id);
+      tempData.add([
         data["tv_program"] ?? '',
         _formatDate(data["created_at"]),
         'delete'
       ]);
     }
+
+    listId.assignAll(tempIds);
+    listData.assignAll(tempData);
     isGo.value = true;
   }
 
   Future<void> getEmailAddress() async {
     isGo.value = false;
-    listData.clear();
-    listId.clear();
+    List<List<String>> tempData = [];
+    List<String> tempIds = [];
+
     final snapshot = await FirebaseFirestore.instance.collection('email').get();
     for (var doc in snapshot.docs) {
       var data = doc.data();
-      listId.add(doc.id);
-      listData.add([
+      tempIds.add(doc.id);
+      tempData.add([
         data["name"] ?? '',
         data["email"] ?? '',
         data["phone"] ?? '',
@@ -174,19 +187,23 @@ class OtherController extends GetxController {
         'delete',
       ]);
     }
+
+    listId.assignAll(tempIds);
+    listData.assignAll(tempData);
     isGo.value = true;
   }
 
   Future<void> getDontation() async {
     isGo.value = false;
-    listData.clear();
-    listId.clear();
+    List<List<String>> tempData = [];
+    List<String> tempIds = [];
+
     final snapshot =
         await FirebaseFirestore.instance.collection('donation').get();
     for (var doc in snapshot.docs) {
       var data = doc.data();
-      listId.add(doc.id);
-      listData.add([
+      tempIds.add(doc.id);
+      tempData.add([
         data["donor_name"] ?? '',
         data["contact"] ?? '',
         data["amount"] ?? '',
@@ -195,6 +212,9 @@ class OtherController extends GetxController {
         'delete',
       ]);
     }
+
+    listId.assignAll(tempIds);
+    listData.assignAll(tempData);
     isGo.value = true;
   }
 }

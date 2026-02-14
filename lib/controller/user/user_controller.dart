@@ -24,13 +24,14 @@ class UserController extends GetxController {
   }
 
   Future<void> getUser() async {
-    listData.clear();
-    listId.clear();
+    List<List<String>> tempData = [];
+    List<String> tempIds = [];
+
     final snapshot = await FirebaseFirestore.instance.collection('login').get();
     for (var doc in snapshot.docs) {
       var data = doc.data();
-      listId.add(doc.id);
-      listData.add([
+      tempIds.add(doc.id);
+      tempData.add([
         data["name"] ?? '',
         data["location"] ?? '',
         data["mobile"] ?? '',
@@ -39,6 +40,9 @@ class UserController extends GetxController {
         'delete',
       ]);
     }
+
+    listId.assignAll(tempIds);
+    listData.assignAll(tempData);
   }
 
   Future<void> deleteUser(BuildContext context, int index) async {

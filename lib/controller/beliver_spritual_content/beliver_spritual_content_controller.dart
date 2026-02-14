@@ -2,29 +2,41 @@ import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:pjspaul_admin/utils/firebase_storage_helper.dart';
 import 'package:pjspaul_admin/view/widget/custom_toast.dart';
 import 'package:pjspaul_admin/view/widget/progressbar.dart';
 
-class BeliverSpritualContentController extends GetxController{
+class BeliverSpritualContentController extends GetxController {
   RxBool isGo = true.obs;
-
   RxBool isShowAdd = false.obs;
+
   List<List<String>> list = [
     [],
-    ["Blessing Text", "Image Upload", "Video Upload", "Delete"],
-    ["Event Title", "Location", "Date and Time", "Description", "Image Upload", "Video Upload", "Delete"],
-    ["Title", "Message Content", "Video", "Delete"],
-    ["Video Title", "Video Upload", "Delete"],
-    ["Song Title", "Audio File", "Delete"],
+    ["Blessing Text", "Image Upload", "Video Upload", "Date", "Delete"],
+    [
+      "Event Title",
+      "Location",
+      "Date and Time",
+      "Description",
+      "Image Upload",
+      "Video Upload",
+      "Date",
+      "Delete"
+    ],
+    ["Title", "Message Content", "Video", "Date", "Delete"],
+    ["Video Title", "Video Upload", "Date", "Delete"],
+    ["Song Title", "Audio File", "Date", "Delete"],
   ];
   RxInt selectedIndex = 0.obs;
 
+  // Store full doc data for proper media rendering and deletion
   RxList<List<String>> listData = <List<String>>[].obs;
   RxList<String> listId = <String>[].obs;
+  // Store video_type info per row for each video column
+  RxList<Map<String, String>> listMeta = <Map<String, String>>[].obs;
 
   Rxn<Uint8List?> selectedImageFile = Rxn();
   Future<void> pickImageFile() async {
@@ -32,71 +44,60 @@ class BeliverSpritualContentController extends GetxController{
       type: FileType.custom,
       allowedExtensions: ['jpg', 'jpeg', 'png'],
     );
-
     if (result != null) {
       Uint8List file = result.files.single.bytes!;
-
-      // Validate file size (2 MB = 2 * 1024 * 1024 bytes)
       if (file.length <= 2 * 1024 * 1024) {
-          selectedImageFile.value = file;
+        selectedImageFile.value = file;
       } else {
-          selectedImageFile.value = null;
-           CustomToast.instance.showMsg("File is more than 2 MB");
+        selectedImageFile.value = null;
+        CustomToast.instance.showMsg("File is more than 2 MB");
       }
     }
   }
 
   Rxn<Uint8List> selectedFile = Rxn();
-
   Future<void> pickFile({List<String>? allowedExtensions}) async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
-      allowedExtensions: allowedExtensions ?? ['png', 'jpg', 'jpeg', 'png', 'mp4', 'mp3', 'wav', 'doc', 'docx', 'pdf'],
+      allowedExtensions: allowedExtensions ??
+          ['png', 'jpg', 'jpeg', 'mp4', 'mp3', 'wav', 'doc', 'docx', 'pdf'],
     );
-
     if (result != null) {
-      Uint8List? file = result.files.single.bytes;
-
-      // Validate file size (2 MB = 2 * 1024 * 1024 bytes)
-      // if (file!.length <= 10 * 1024 * 1024) {
-          selectedFile.value = file;
-      // } else {
-      //     selectedFile.value = null;
-      //     CustomToast.instance.showMsg("File is more than 2 MB");
-      // }
+      selectedFile.value = result.files.single.bytes;
     }
   }
 
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
+  String _formatDate(dynamic timestamp) {
+    if (timestamp == null) return 'N/A';
+    if (timestamp is Timestamp) {
+      return DateFormat('dd MMM yyyy, hh:mm a').format(timestamp.toDate());
+    }
+    if (timestamp is String) return timestamp;
+    return 'N/A';
+  }
+
+  // ──────────────── RADIO LINK ────────────────
+
   final radioForm = GlobalKey<FormState>();
-  final TextEditingController lifeChangingRadioController = TextEditingController();
+  final TextEditingController lifeChangingRadioController =
+      TextEditingController();
+
   Future<void> addRadioLink(BuildContext context) async {
     try {
       ProgressBar.instance.showProgressbar(context);
-      // final storageRef = FirebaseStorage.instance.ref();
-
-      // final fileImageRef = storageRef.child('today_blessing/${selectedImageFile.value!.path.split('/').last.split('.').first}_${DateTime.now().millisecondsSinceEpoch}.${selectedImageFile.value!.path.split('.').last}');
-      // await fileImageRef.putData(selectedImageFile.value!);
-      // String imageUrl = await fileImageRef.getDownloadURL();
-
-      // final fileRef = storageRef.child('today_blessing/${selectedFile.value!.path.split('/').last.split('.').first}_${DateTime.now().millisecondsSinceEpoch}.${selectedFile.value!.path.split('.').last}');
-      // await fileRef.putData(selectedFile.value!);
-      // String videoUrl = await fileRef.getDownloadURL();
-
       CollectionReference request = firestore.collection('radio');
-
       await request.doc('radio_link').update({
-      'link':lifeChangingRadioController.text         
-    });
+        'link': lifeChangingRadioController.text,
+        'updated_at': FieldValue.serverTimestamp(),
+      });
       ProgressBar.instance.stopProgressBar(context);
-      // Get.back();
       CustomToast.instance.showMsg("Added Successfully");
     } catch (e) {
       ProgressBar.instance.stopProgressBar(context);
-      // Get.back();
       CustomToast.instance.showMsg("Something went wrong");
-    } finally{
+    } finally {
       lifeChangingRadioController.clear();
       getRadioLink();
     }
@@ -106,60 +107,71 @@ class BeliverSpritualContentController extends GetxController{
     isGo.value = false;
     listData.clear();
     listId.clear();
-    final FirebaseFirestore firestore = FirebaseFirestore.instance;
+    listMeta.clear();
     firestore.collection('radio').get().then((snapshot) {
       listData.clear();
-    listId.clear();
-      snapshot.docs.forEach((doc) {
+      listId.clear();
+      for (var doc in snapshot.docs) {
         var data = doc.data();
         listId.add(doc.id);
-        listData.add([data["link"]]);
-      });
-      print("getRadioLink");
+        listData.add([data["link"] ?? '']);
+      }
       isGo.value = true;
     });
   }
 
-
+  // ──────────────── TODAY'S BLESSING ────────────────
 
   final blessingForm = GlobalKey<FormState>();
   final TextEditingController blessingController = TextEditingController();
   final TextEditingController youtubeVideoController = TextEditingController();
   RxBool isYoutube = false.obs;
+
   Future<void> addTodayBlessing(BuildContext context) async {
     try {
       ProgressBar.instance.showProgressbar(context);
-      String imageUrl = "";
+
+      // Upload image
+      final imageResult = await FirebaseStorageHelper.uploadFile(
+        folder: 'today_blessing',
+        bytes: selectedImageFile.value!,
+        extension: 'png',
+      );
+
+      // Upload video or use YouTube URL
       String videoUrl = "";
-      final storageRef = FirebaseStorage.instance.ref();
+      String videoStoragePath = "";
+      String videoType = "upload";
 
-      final fileImageRef = storageRef.child('today_blessing/${DateTime.now().millisecondsSinceEpoch}.png');
-      await fileImageRef.putData(selectedImageFile.value!);
-      imageUrl = await fileImageRef.getDownloadURL();
-      if(youtubeVideoController.text.isEmpty){
-        final fileRef = storageRef.child('today_blessing/${DateTime.now().millisecondsSinceEpoch}.mp4');
-        await fileRef.putData(selectedFile.value!);
-        videoUrl = await fileRef.getDownloadURL();
-      } else {
+      if (youtubeVideoController.text.isNotEmpty) {
         videoUrl = youtubeVideoController.text;
+        videoType = "youtube";
+      } else {
+        final videoResult = await FirebaseStorageHelper.uploadFile(
+          folder: 'today_blessing',
+          bytes: selectedFile.value!,
+          extension: 'mp4',
+        );
+        videoUrl = videoResult['download_url']!;
+        videoStoragePath = videoResult['storage_path']!;
       }
-      
-      CollectionReference request = firestore.collection('today_blessing');
 
-      await request.add({
-      'blessing': blessingController.text,
-      'image': imageUrl,
-      'video': videoUrl,    
-    });
+      await firestore.collection('today_blessing').add({
+        'blessing': blessingController.text,
+        'image': imageResult['download_url']!,
+        'image_storage_path': imageResult['storage_path']!,
+        'video': videoUrl,
+        'video_storage_path': videoStoragePath,
+        'video_type': videoType,
+        'created_at': FieldValue.serverTimestamp(),
+      });
       ProgressBar.instance.stopProgressBar(context);
-      // Get.back();
       CustomToast.instance.showMsg("Added Successfully");
     } catch (e) {
       ProgressBar.instance.stopProgressBar(context);
-      // Get.back();
-      print("Error $e");
+      debugPrint("Error $e");
       CustomToast.instance.showMsg("Something went wrong");
-    } finally{
+    } finally {
       blessingController.clear();
       selectedFile = Rxn();
       selectedImageFile = Rxn();
@@ -172,38 +184,56 @@ class BeliverSpritualContentController extends GetxController{
     isGo.value = false;
     listData.clear();
     listId.clear();
-    final FirebaseFirestore firestore = FirebaseFirestore.instance;
+    listMeta.clear();
     firestore.collection('today_blessing').get().then((snapshot) {
       listData.clear();
       listId.clear();
-      snapshot.docs.forEach((doc) {
-        listId.add(doc.id);
+      listMeta.clear();
+      for (var doc in snapshot.docs) {
         var data = doc.data();
         listId.add(doc.id);
-        listData.add([data["blessing"], data["image"], data["video"], "delete"]);
-      });
-       print("getTodayBlessing");
-       isGo.value = true;
+        listData.add([
+          data["blessing"] ?? '',
+          data["image"] ?? '',
+          data["video"] ?? '',
+          _formatDate(data["created_at"]),
+          "delete",
+        ]);
+        listMeta.add({
+          'video_type': data['video_type'] ?? '',
+          'image_storage_path': data['image_storage_path'] ?? '',
+          'video_storage_path': data['video_storage_path'] ?? '',
+        });
+      }
+      isGo.value = true;
     });
   }
 
-
-Future<void> deleteTodayBlessing(BuildContext context, int index) async {
-  try {
-    ProgressBar.instance.showProgressbar(context);
-    await FirebaseFirestore.instance
-        .collection('today_blessing') // Replace with your collection name
-        .doc(listId[index]) // Document ID
-        .delete();
-    ProgressBar.instance.stopProgressBar(context);
-    CustomToast.instance.showMsg("Delete successfully");
-  } catch (e) {
-    ProgressBar.instance.stopProgressBar(context);
-    CustomToast.instance.showMsg("Something went wrong");
-  } finally {
-    getTodayBlessing();
+  Future<void> deleteTodayBlessing(BuildContext context, int index) async {
+    try {
+      ProgressBar.instance.showProgressbar(context);
+      // Delete storage files
+      final doc =
+          await firestore.collection('today_blessing').doc(listId[index]).get();
+      if (doc.exists) {
+        final data = doc.data()!;
+        await FirebaseStorageHelper.deleteFile(data['image_storage_path']);
+        if (data['video_type'] != 'youtube') {
+          await FirebaseStorageHelper.deleteFile(data['video_storage_path']);
+        }
+      }
+      await firestore.collection('today_blessing').doc(listId[index]).delete();
+      ProgressBar.instance.stopProgressBar(context);
+      CustomToast.instance.showMsg("Delete successfully");
+    } catch (e) {
+      ProgressBar.instance.stopProgressBar(context);
+      CustomToast.instance.showMsg("Something went wrong");
+    } finally {
+      getTodayBlessing();
+    }
   }
-}
+
+  // ──────────────── UPCOMING EVENT ────────────────
 
   final upcomingEventForm = GlobalKey<FormState>();
   final TextEditingController eventTitleController = TextEditingController();
@@ -211,55 +241,61 @@ Future<void> deleteTodayBlessing(BuildContext context, int index) async {
   final TextEditingController descriptionController = TextEditingController();
   Rxn<DateTime> selectedDate = Rxn();
   Rxn<TimeOfDay> selectedTime = Rxn();
-  String formatTimeOfDay(TimeOfDay tod, BuildContext contxet) {
-      final now = DateTime.now();
-      final dt = DateTime(now.year, now.month, now.day, tod.hour, tod.minute);
-      return TimeOfDay.fromDateTime(dt).format(contxet);
-    }
+
+  String formatTimeOfDay(TimeOfDay tod, BuildContext context) {
+    final now = DateTime.now();
+    final dt = DateTime(now.year, now.month, now.day, tod.hour, tod.minute);
+    return TimeOfDay.fromDateTime(dt).format(context);
+  }
+
   Future<void> addUpcomingEvent(BuildContext context) async {
     try {
       ProgressBar.instance.showProgressbar(context);
-      final storageRef = FirebaseStorage.instance.ref();
-       String imageUrl = "";
-      if(selectedImageFile.value != null){
-        final fileImageRef = storageRef.child('upcoming_event/${DateTime.now().millisecondsSinceEpoch}.png');
-         await fileImageRef.putData(selectedImageFile.value!);
-         imageUrl = await fileImageRef.getDownloadURL();
+
+      String imageUrl = "";
+      String imageStoragePath = "";
+      if (selectedImageFile.value != null) {
+        final result = await FirebaseStorageHelper.uploadFile(
+          folder: 'upcoming_event',
+          bytes: selectedImageFile.value!,
+          extension: 'png',
+        );
+        imageUrl = result['download_url']!;
+        imageStoragePath = result['storage_path']!;
       }
-      // final fileImageRef = storageRef.child('upcoming_event/${DateTime.now().millisecondsSinceEpoch}.png');
-      // await fileImageRef.putData(selectedImageFile.value!);
-      // String imageUrl = await fileImageRef.getDownloadURL();
 
       String videoUrl = "";
-      if(selectedFile.value != null){
-        final fileRef = storageRef.child('upcoming_event/${DateTime.now().millisecondsSinceEpoch}.mp4');
-        await fileRef.putData(selectedFile.value!);
-        videoUrl = await fileRef.getDownloadURL();
+      String videoStoragePath = "";
+      if (selectedFile.value != null) {
+        final result = await FirebaseStorageHelper.uploadFile(
+          folder: 'upcoming_event',
+          bytes: selectedFile.value!,
+          extension: 'mp4',
+        );
+        videoUrl = result['download_url']!;
+        videoStoragePath = result['storage_path']!;
       }
-      // final fileRef = storageRef.child('upcoming_event/${DateTime.now().millisecondsSinceEpoch}.mp4');
-      // await fileRef.putData(selectedFile.value!);
-      // String videoUrl = await fileRef.getDownloadURL();
 
-      CollectionReference request = firestore.collection('upcoming_event');
-
-      await request.add({
+      await firestore.collection('upcoming_event').add({
         'event_title': eventTitleController.text,
         'date': DateFormat('d MMM, yyyy').format(selectedDate.value!),
         'time': formatTimeOfDay(selectedTime.value!, context),
         'location': locationController.text,
         'description': descriptionController.text,
         'image': imageUrl,
-        'video': videoUrl,   
+        'image_storage_path': imageStoragePath,
+        'video': videoUrl,
+        'video_storage_path': videoStoragePath,
+        'video_type': 'upload',
+        'created_at': FieldValue.serverTimestamp(),
       });
       ProgressBar.instance.stopProgressBar(context);
-      // Get.back();
       CustomToast.instance.showMsg("Added Successfully");
     } catch (e) {
       ProgressBar.instance.stopProgressBar(context);
-      // Get.back();
-      print("Error $e");
+      debugPrint("Error $e");
       CustomToast.instance.showMsg("Something went wrong");
-    } finally{
+    } finally {
       eventTitleController.clear();
       locationController.clear();
       descriptionController.clear();
@@ -270,42 +306,61 @@ Future<void> deleteTodayBlessing(BuildContext context, int index) async {
       getUpcomingEvent();
     }
   }
-  
+
   Future<void> getUpcomingEvent() async {
     isGo.value = false;
     listData.clear();
     listId.clear();
-    final FirebaseFirestore firestore = FirebaseFirestore.instance;
+    listMeta.clear();
     firestore.collection('upcoming_event').get().then((snapshot) {
       listData.clear();
       listId.clear();
-      snapshot.docs.forEach((doc) {
+      listMeta.clear();
+      for (var doc in snapshot.docs) {
         var data = doc.data();
         listId.add(doc.id);
-        listData.add([data["event_title"], data["location"], "${data["date"]} ${data["time"]}", data["description"], data["image"], data["video"], "delete"]);
-        
-      });
-      print("getUpcomingEvent");
-              isGo.value = true;
+        listData.add([
+          data["event_title"] ?? '',
+          data["location"] ?? '',
+          "${data["date"] ?? ''} ${data["time"] ?? ''}",
+          data["description"] ?? '',
+          data["image"] ?? '',
+          data["video"] ?? '',
+          _formatDate(data["created_at"]),
+          "delete",
+        ]);
+        listMeta.add({
+          'video_type': data['video_type'] ?? 'upload',
+          'image_storage_path': data['image_storage_path'] ?? '',
+          'video_storage_path': data['video_storage_path'] ?? '',
+        });
+      }
+      isGo.value = true;
     });
   }
 
   Future<void> deleteUpcomingEvent(BuildContext context, int index) async {
-  try {
-    ProgressBar.instance.showProgressbar(context);
-    await FirebaseFirestore.instance
-        .collection('upcoming_event') // Replace with your collection name
-        .doc(listId[index]) // Document ID
-        .delete();
-    ProgressBar.instance.stopProgressBar(context);
-    CustomToast.instance.showMsg("Delete successfully");
-  } catch (e) {
-    ProgressBar.instance.stopProgressBar(context);
-    CustomToast.instance.showMsg("Something went wrong");
-  } finally {
-    getUpcomingEvent();
+    try {
+      ProgressBar.instance.showProgressbar(context);
+      final doc =
+          await firestore.collection('upcoming_event').doc(listId[index]).get();
+      if (doc.exists) {
+        final data = doc.data()!;
+        await FirebaseStorageHelper.deleteFile(data['image_storage_path']);
+        await FirebaseStorageHelper.deleteFile(data['video_storage_path']);
+      }
+      await firestore.collection('upcoming_event').doc(listId[index]).delete();
+      ProgressBar.instance.stopProgressBar(context);
+      CustomToast.instance.showMsg("Delete successfully");
+    } catch (e) {
+      ProgressBar.instance.stopProgressBar(context);
+      CustomToast.instance.showMsg("Something went wrong");
+    } finally {
+      getUpcomingEvent();
+    }
   }
-}
+
+  // ──────────────── SHORT MESSAGE ────────────────
 
   final shortMessageForm = GlobalKey<FormState>();
   final TextEditingController shortController = TextEditingController();
@@ -314,36 +369,39 @@ Future<void> deleteTodayBlessing(BuildContext context, int index) async {
   Future<void> addShortMessage(BuildContext context) async {
     try {
       ProgressBar.instance.showProgressbar(context);
-      final storageRef = FirebaseStorage.instance.ref();
 
-      // final fileImageRef = storageRef.child('today_blessing/${DateTime.now().millisecondsSinceEpoch}.png');
-      // await fileImageRef.putData(selectedImageFile.value!);
-      // String imageUrl = await fileImageRef.getDownloadURL();
-      String? videoUrl = "";
-      if(youtubeVideoController.text.isEmpty){
-        final fileRef = storageRef.child('short_video/${DateTime.now().millisecondsSinceEpoch}.mp4');
-        await fileRef.putData(selectedFile.value!);
-        videoUrl = await fileRef.getDownloadURL();
-      } else {
+      String videoUrl = "";
+      String videoStoragePath = "";
+      String videoType = "upload";
+
+      if (youtubeVideoController.text.isNotEmpty) {
         videoUrl = youtubeVideoController.text;
+        videoType = "youtube";
+      } else {
+        final result = await FirebaseStorageHelper.uploadFile(
+          folder: 'short_video',
+          bytes: selectedFile.value!,
+          extension: 'mp4',
+        );
+        videoUrl = result['download_url']!;
+        videoStoragePath = result['storage_path']!;
       }
 
-      CollectionReference request = firestore.collection('short_message');
-
-      await request.add({
+      await firestore.collection('short_message').add({
         'title': shortController.text,
         'message': messageController.text,
-        'video': videoUrl
+        'video': videoUrl,
+        'video_storage_path': videoStoragePath,
+        'video_type': videoType,
+        'created_at': FieldValue.serverTimestamp(),
       });
       ProgressBar.instance.stopProgressBar(context);
-      // Get.back();
       CustomToast.instance.showMsg("Added Successfully");
     } catch (e) {
       ProgressBar.instance.stopProgressBar(context);
-      // Get.back();
-      print("Error $e");
+      debugPrint("Error $e");
       CustomToast.instance.showMsg("Something went wrong");
-    } finally{
+    } finally {
       shortController.clear();
       messageController.clear();
       selectedFile = Rxn();
@@ -356,71 +414,92 @@ Future<void> deleteTodayBlessing(BuildContext context, int index) async {
     isGo.value = false;
     listData.clear();
     listId.clear();
-    final FirebaseFirestore firestore = FirebaseFirestore.instance;
+    listMeta.clear();
     firestore.collection('short_message').get().then((snapshot) {
       listData.clear();
       listId.clear();
-      snapshot.docs.forEach((doc) {
+      listMeta.clear();
+      for (var doc in snapshot.docs) {
         var data = doc.data();
         listId.add(doc.id);
-        listData.add([data["title"], data["message"], data["video"], "delete"]);
-      });
-      print("getShortMessage");
-        isGo.value = true;
-      });
+        listData.add([
+          data["title"] ?? '',
+          data["message"] ?? '',
+          data["video"] ?? '',
+          _formatDate(data["created_at"]),
+          "delete",
+        ]);
+        listMeta.add({
+          'video_type': data['video_type'] ?? '',
+          'video_storage_path': data['video_storage_path'] ?? '',
+        });
+      }
+      isGo.value = true;
+    });
   }
 
   Future<void> deleteShortMessage(BuildContext context, int index) async {
-  try {
-    ProgressBar.instance.showProgressbar(context);
-    await FirebaseFirestore.instance
-        .collection('short_message') // Replace with your collection name
-        .doc(listId[index]) // Document ID
-        .delete();
-    ProgressBar.instance.stopProgressBar(context);
-    CustomToast.instance.showMsg("Delete successfully");
-  } catch (e) {
-    ProgressBar.instance.stopProgressBar(context);
-    CustomToast.instance.showMsg("Something went wrong");
-  } finally {
-    getShortMessage();
+    try {
+      ProgressBar.instance.showProgressbar(context);
+      final doc =
+          await firestore.collection('short_message').doc(listId[index]).get();
+      if (doc.exists) {
+        final data = doc.data()!;
+        if (data['video_type'] != 'youtube') {
+          await FirebaseStorageHelper.deleteFile(data['video_storage_path']);
+        }
+      }
+      await firestore.collection('short_message').doc(listId[index]).delete();
+      ProgressBar.instance.stopProgressBar(context);
+      CustomToast.instance.showMsg("Delete successfully");
+    } catch (e) {
+      ProgressBar.instance.stopProgressBar(context);
+      CustomToast.instance.showMsg("Something went wrong");
+    } finally {
+      getShortMessage();
+    }
   }
-}
+
+  // ──────────────── LIFE CHANGING MESSAGE ────────────────
 
   final lifeMessgaeForm = GlobalKey<FormState>();
   final TextEditingController videoTitleController = TextEditingController();
+
   Future<void> addLifeMessage(BuildContext context) async {
     try {
       ProgressBar.instance.showProgressbar(context);
-      final storageRef = FirebaseStorage.instance.ref();
 
-      // final fileImageRef = storageRef.child('today_blessing/${DateTime.now().millisecondsSinceEpoch}.png');
-      // await fileImageRef.putData(selectedImageFile.value!);
-      // String imageUrl = await fileImageRef.getDownloadURL();
       String videoUrl = "";
-      if(youtubeVideoController.text.isEmpty){
-        final fileRef = storageRef.child('life_message/${DateTime.now().millisecondsSinceEpoch}.mp4');
-        await fileRef.putData(selectedFile.value!);
-        videoUrl = await fileRef.getDownloadURL();
-      } else {
+      String videoStoragePath = "";
+      String videoType = "upload";
+
+      if (youtubeVideoController.text.isNotEmpty) {
         videoUrl = youtubeVideoController.text;
+        videoType = "youtube";
+      } else {
+        final result = await FirebaseStorageHelper.uploadFile(
+          folder: 'life_message',
+          bytes: selectedFile.value!,
+          extension: 'mp4',
+        );
+        videoUrl = result['download_url']!;
+        videoStoragePath = result['storage_path']!;
       }
 
-      CollectionReference request = firestore.collection('life_message');
-
-      await request.add({
+      await firestore.collection('life_message').add({
         'title': videoTitleController.text,
         'video': videoUrl,
+        'video_storage_path': videoStoragePath,
+        'video_type': videoType,
+        'created_at': FieldValue.serverTimestamp(),
       });
       ProgressBar.instance.stopProgressBar(context);
-      // Get.back();
       CustomToast.instance.showMsg("Added Successfully");
     } catch (e) {
       ProgressBar.instance.stopProgressBar(context);
-      // Get.back();
-      print("Error $e");
+      debugPrint("Error $e");
       CustomToast.instance.showMsg("Something went wrong");
-    } finally{
+    } finally {
       videoTitleController.clear();
       selectedFile = Rxn();
       youtubeVideoController.text = "";
@@ -432,67 +511,79 @@ Future<void> deleteTodayBlessing(BuildContext context, int index) async {
     isGo.value = false;
     listData.clear();
     listId.clear();
-    final FirebaseFirestore firestore = FirebaseFirestore.instance;
+    listMeta.clear();
     firestore.collection('life_message').get().then((snapshot) {
       listData.clear();
       listId.clear();
-      snapshot.docs.forEach((doc) {
+      listMeta.clear();
+      for (var doc in snapshot.docs) {
         var data = doc.data();
         listId.add(doc.id);
-        listData.add([data["title"], data["video"], "delete"]);
-      });
-       print("getLifeMessage");
-               isGo.value = true;
+        listData.add([
+          data["title"] ?? '',
+          data["video"] ?? '',
+          _formatDate(data["created_at"]),
+          "delete",
+        ]);
+        listMeta.add({
+          'video_type': data['video_type'] ?? '',
+          'video_storage_path': data['video_storage_path'] ?? '',
+        });
+      }
+      isGo.value = true;
     });
   }
 
   Future<void> deleteLifeMessage(BuildContext context, int index) async {
-  try {
-    ProgressBar.instance.showProgressbar(context);
-    await FirebaseFirestore.instance
-        .collection('life_message') // Replace with your collection name
-        .doc(listId[index]) // Document ID
-        .delete();
-    ProgressBar.instance.stopProgressBar(context);
-    CustomToast.instance.showMsg("Delete successfully");
-  } catch (e) {
-    ProgressBar.instance.stopProgressBar(context);
-    CustomToast.instance.showMsg("Something went wrong");
-  } finally {
-    getLifeMessage();
+    try {
+      ProgressBar.instance.showProgressbar(context);
+      final doc =
+          await firestore.collection('life_message').doc(listId[index]).get();
+      if (doc.exists) {
+        final data = doc.data()!;
+        if (data['video_type'] != 'youtube') {
+          await FirebaseStorageHelper.deleteFile(data['video_storage_path']);
+        }
+      }
+      await firestore.collection('life_message').doc(listId[index]).delete();
+      ProgressBar.instance.stopProgressBar(context);
+      CustomToast.instance.showMsg("Delete successfully");
+    } catch (e) {
+      ProgressBar.instance.stopProgressBar(context);
+      CustomToast.instance.showMsg("Something went wrong");
+    } finally {
+      getLifeMessage();
+    }
   }
-}
+
+  // ──────────────── LIFE CHANGING SONG ────────────────
 
   final lifeSongForm = GlobalKey<FormState>();
   final TextEditingController songTitleController = TextEditingController();
+
   Future<void> addLifeSong(BuildContext context) async {
     try {
       ProgressBar.instance.showProgressbar(context);
-      final storageRef = FirebaseStorage.instance.ref();
 
-      // final fileImageRef = storageRef.child('today_blessing/${DateTime.now().millisecondsSinceEpoch}.png');
-      // await fileImageRef.putData(selectedImageFile.value!);
-      // String imageUrl = await fileImageRef.getDownloadURL();
+      final result = await FirebaseStorageHelper.uploadFile(
+        folder: 'life_song',
+        bytes: selectedFile.value!,
+        extension: 'mp3',
+      );
 
-      final fileRef = storageRef.child('life_song/${DateTime.now().millisecondsSinceEpoch}.mp3');
-      await fileRef.putData(selectedFile.value!);
-      String url = await fileRef.getDownloadURL();
-
-      CollectionReference request = firestore.collection('life_song');
-
-      await request.add({
+      await firestore.collection('life_song').add({
         'title': songTitleController.text,
-        'audio': url,
+        'audio': result['download_url']!,
+        'audio_storage_path': result['storage_path']!,
+        'created_at': FieldValue.serverTimestamp(),
       });
       ProgressBar.instance.stopProgressBar(context);
-      // Get.back();
       CustomToast.instance.showMsg("Added Successfully");
     } catch (e) {
       ProgressBar.instance.stopProgressBar(context);
-      // Get.back();
-      print("Error $e");
+      debugPrint("Error $e");
       CustomToast.instance.showMsg("Something went wrong");
-    } finally{
+    } finally {
       songTitleController.clear();
       selectedFile = Rxn();
       getLifeSong();
@@ -503,34 +594,45 @@ Future<void> deleteTodayBlessing(BuildContext context, int index) async {
     isGo.value = false;
     listData.clear();
     listId.clear();
-    final FirebaseFirestore firestore = FirebaseFirestore.instance;
+    listMeta.clear();
     firestore.collection('life_song').get().then((snapshot) {
       listData.clear();
       listId.clear();
-      snapshot.docs.forEach((doc) {
+      listMeta.clear();
+      for (var doc in snapshot.docs) {
         var data = doc.data();
         listId.add(doc.id);
-        listData.add([data["title"], data["audio"], "delete"]);
-      });
-      print("getLifeSong");
-              isGo.value = true;
+        listData.add([
+          data["title"] ?? '',
+          data["audio"] ?? '',
+          _formatDate(data["created_at"]),
+          "delete",
+        ]);
+        listMeta.add({
+          'audio_storage_path': data['audio_storage_path'] ?? '',
+        });
+      }
+      isGo.value = true;
     });
   }
 
   Future<void> deleteLifeSong(BuildContext context, int index) async {
-  try {
-    ProgressBar.instance.showProgressbar(context);
-    await FirebaseFirestore.instance
-        .collection('life_song') // Replace with your collection name
-        .doc(listId[index]) // Document ID
-        .delete();
-    ProgressBar.instance.stopProgressBar(context);
-    CustomToast.instance.showMsg("Delete successfully");
-  } catch (e) {
-    ProgressBar.instance.stopProgressBar(context);
-    CustomToast.instance.showMsg("Something went wrong");
-  } finally {
-    getLifeSong();
+    try {
+      ProgressBar.instance.showProgressbar(context);
+      final doc =
+          await firestore.collection('life_song').doc(listId[index]).get();
+      if (doc.exists) {
+        final data = doc.data()!;
+        await FirebaseStorageHelper.deleteFile(data['audio_storage_path']);
+      }
+      await firestore.collection('life_song').doc(listId[index]).delete();
+      ProgressBar.instance.stopProgressBar(context);
+      CustomToast.instance.showMsg("Delete successfully");
+    } catch (e) {
+      ProgressBar.instance.stopProgressBar(context);
+      CustomToast.instance.showMsg("Something went wrong");
+    } finally {
+      getLifeSong();
+    }
   }
-}
 }

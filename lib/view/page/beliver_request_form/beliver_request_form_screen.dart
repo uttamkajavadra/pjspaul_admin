@@ -1,172 +1,201 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pjspaul_admin/controller/beliver_request_form/beliver_request_form_controller.dart';
-import 'package:pjspaul_admin/view/widget/custom_dropdown.dart';
-// import 'dart:html' as html;
+import 'package:pjspaul_admin/view/widget/delete_confirmation_dialog.dart';
+import 'package:pjspaul_admin/view/widget/detail_dialog.dart';
+import 'package:pjspaul_admin/view/widget/responsive_data_grid.dart';
 
 class BeliverRequestFormScreen extends StatefulWidget {
   const BeliverRequestFormScreen({super.key});
 
   @override
-  State<BeliverRequestFormScreen> createState() => _BeliverRequestFormScreenState();
+  State<BeliverRequestFormScreen> createState() =>
+      _BeliverRequestFormScreenState();
 }
 
 class _BeliverRequestFormScreenState extends State<BeliverRequestFormScreen> {
-  BeliverRequestFormController controller = Get.isRegistered<BeliverRequestFormController>() 
-    ? Get.find<BeliverRequestFormController>() : Get.put(BeliverRequestFormController());
+  BeliverRequestFormController controller =
+      Get.isRegistered<BeliverRequestFormController>()
+          ? Get.find<BeliverRequestFormController>()
+          : Get.put(BeliverRequestFormController());
 
   @override
   void initState() {
-    // if (controller.selectedIndex.value == 0) {
-    //                       controller.getPrayerRequest();
-    //                     } else if(controller.selectedIndex.value == 1){
-    //                       controller.getTestimonyRequest();
-    //                     } else if(controller.selectedIndex.value == 2){
-    //                       controller.getCottagePrayer();
-    //                     } else if(controller.selectedIndex.value == 3){
-    //                       controller.getCounselingRequest();
-    //                     } else if(controller.selectedIndex.value == 4){
-    //                       controller.getFeedbackRequest();
-    //                     } else if(controller.selectedIndex.value == 5){
-    //                       controller.getPastorRequest();
-    //                     } else if(controller.selectedIndex.value == 6){
-    //                       controller.getChildDedication();
-    //                     } else if(controller.selectedIndex.value == 7){
-    //                       controller.getVolunteerEnrollment();
-    //                     }
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
-    if (controller.selectedIndex.value == 0) {
-                          controller.getPrayerRequest();
-                        } else if(controller.selectedIndex.value == 1){
-                          controller.getTestimonyRequest();
-                        } else if(controller.selectedIndex.value == 2){
-                          controller.getCottagePrayer();
-                        } else if(controller.selectedIndex.value == 3){
-                          controller.getCounselingRequest();
-                        } else if(controller.selectedIndex.value == 4){
-                          controller.getFeedbackRequest();
-                        } else if(controller.selectedIndex.value == 5){
-                          controller.getPastorRequest();
-                        } else if(controller.selectedIndex.value == 6){
-                          controller.getChildDedication();
-                        } else if(controller.selectedIndex.value == 7){
-                          controller.getVolunteerEnrollment();
-                        }
+    controller.refreshCurrent();
     return Scaffold(
       backgroundColor: Colors.white,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Row(
-          //   children: [
-          //     Spacer(),
-          //     SizedBox(
-          //       width: 300,
-          //       child: Obx(() {
-          //         return CustomDropDown(
-          //             value: controller.selectedIndex.value,
-          //             items: [
-          //               "Prayer Request",
-          //               "Testimony Request",
-          //               "Cottage Prayers/Hospital Visit Request",
-          //               "Prayer & Counseling Request",
-          //               "Suggestions/Feedback",
-          //               "Pastor's Appointment Request",
-          //               "Child Dedication Request",
-          //               "Volunteer Enrollment Request"
-          //             ],
-          //             onChanged: (index) {
-          //               controller.selectedIndex.value = index;
-          //               if (index == 0) {
-          //                 controller.getPrayerRequest();
-          //               } else if(index == 1){
-          //                 controller.getTestimonyRequest();
-          //               } else if(index == 2){
-          //                 controller.getCottagePrayer();
-          //               } else if(index == 3){
-          //                 controller.getCounselingRequest();
-          //               } else if(index == 4){
-          //                 controller.getFeedbackRequest();
-          //               } else if(index == 5){
-          //                 controller.getPastorRequest();
-          //               } else if(index == 6){
-          //                 controller.getChildDedication();
-          //               } else if(index == 7){
-          //                 controller.getVolunteerEnrollment();
-          //               }
-          //             },
-          //             validator: (value) => null);
-          //       }),
-          //     ),
-          //   ],
-          // ),
-          const SizedBox(
-            height: 20,
+          const SizedBox(height: 20),
+          Expanded(
+            child: Obx(() {
+              return (!controller.isGo.value)
+                  ? const Center(child: CircularProgressIndicator())
+                  : (controller.listData.isEmpty)
+                      ? const Center(child: Text("No data found"))
+                      : ResponsiveDataGrid(
+                          itemCount: controller.listData.length,
+                          itemBuilder: (context, index) => _buildCard(index),
+                        );
+            }),
           ),
-          Obx(() {
-            return (controller.listData.isEmpty)?
-            Text("No data found")
-            :Container(
-              decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [BoxShadow(color: Colors.grey.shade200, blurRadius: 20.0)]),
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: DataTable(columns: [
-                  for (int i = 0; i < controller.list[controller.selectedIndex.value].length; i++) ...[
-                    DataColumn(
-                      label: Text(
-                        controller.list[controller.selectedIndex.value][i],
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(color: Colors.black, fontSize: 14, fontWeight: FontWeight.w500),
-                      ),
-                    ),
-                  ]
-                ], rows: [
-                  for (int i = 0; i < controller.listData.length; i++) ...[
-                    DataRow(cells: [
-                      for (int j = 0; j < controller.listData[i].length; j++) ...[
-                        DataCell(
-                          (controller.listData[i][j].startsWith("http"))
-                          ? GestureDetector(
-                            onTap: (){
-                              // html.window.open(controller.listData[i][j], '_blank');
-                              showDialog(context: context, builder: (context){
-                                          return Dialog(
-                                            child: Container(
-                                              width: 500,
-                                              height: 500,
-                                              child: Image.network(controller.listData[i][j],),
-                                            ),
-                                          );
-                                        });
-                            },
-                            child: Container(
-                              padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                              decoration: BoxDecoration(
-                                color: Colors.black,
-                                borderRadius: BorderRadius.circular(6)
-                              ),
-                              child: Text("View", style: TextStyle(color: Colors.white),),
-                            ),
-                          )
-                          : Text(
-                          controller.listData[i][j],
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(color: Colors.black, fontSize: 14, fontWeight: FontWeight.w400),
-                        )),
-                      ],
-                    ]),
-                  ],
-                ]),
-              ),
-            );
-          })
         ],
+      ),
+    );
+  }
+
+  Widget _buildCard(int index) {
+    final row = controller.listData[index];
+    final headers = controller.list[controller.selectedIndex.value];
+
+    // Determine title (Name) - index 0
+    String name = row.isNotEmpty ? row[0] : 'Unknown';
+    String date = row.length > 2 ? row[row.length - 2] : '';
+
+    Map<String, String> details = {};
+    String? imageUrl;
+    String? videoUrl;
+
+    // Scan for details and media
+    for (int i = 0; i < row.length - 2; i++) {
+      if (i < headers.length) {
+        String val = row[i];
+        // Simple media detection
+        if (val.startsWith('http')) {
+          if (val.contains('youtube') || val.endsWith('.mp4')) {
+            videoUrl = val;
+          } else if (val.endsWith('.jpg') ||
+              val.endsWith('.png') ||
+              val.endsWith('.jpeg')) {
+            imageUrl = val;
+          } else {
+            // Fallback or just add to details?
+            // Let's add to details if not identified or just assign to imageUrl as fallback (safe?)
+            // Or just leave it in details
+            details[headers[i]] = val;
+          }
+        } else {
+          details[headers[i]] = val;
+        }
+      }
+    }
+    details['Date'] = date;
+
+    // Subtitle construction
+    List<String> subtitleParts = [];
+    // Try to find common secondary fields like Email, Phone, Subject
+    // Headers usually guide us, but we don't know index certainty.
+    // Let's just grab index 1 and 2 if they exist and are not urls
+    if (row.length > 1 && !row[1].startsWith('http')) subtitleParts.add(row[1]);
+    if (row.length > 2 && !row[2].startsWith('http')) subtitleParts.add(row[2]);
+    String subtitle = subtitleParts.join(" • ");
+
+    return Card(
+      elevation: 0,
+      color: Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: Colors.grey.shade200),
+      ),
+      child: InkWell(
+        onTap: () {
+          DetailDialog.show(
+            context,
+            title: "Request Details",
+            data: details,
+            imageUrl: imageUrl,
+            videoUrl: videoUrl,
+          );
+        },
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      name,
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 16),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.delete_outline, color: Colors.red),
+                    onPressed: () {
+                      DeleteConfirmationDialog.show(
+                        context,
+                        onConfirm: () {
+                          controller.deleteRecord(context, index);
+                        },
+                      );
+                    },
+                  ),
+                ],
+              ),
+              if (subtitle.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                Text(
+                  subtitle,
+                  style: TextStyle(color: Colors.grey[600], fontSize: 13),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+              const Spacer(),
+              if (imageUrl != null || videoUrl != null) ...[
+                const Divider(),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    if (imageUrl != null)
+                      const Icon(Icons.image, size: 16, color: Colors.blue),
+                    if (imageUrl != null && videoUrl != null)
+                      const SizedBox(width: 8),
+                    if (videoUrl != null)
+                      const Icon(Icons.play_circle,
+                          size: 16, color: Colors.red),
+                    const SizedBox(width: 8),
+                    Text(
+                      "Contains Media",
+                      style: TextStyle(color: Colors.blue[800], fontSize: 12),
+                    )
+                  ],
+                )
+              ] else ...[
+                const Divider(),
+                const SizedBox(height: 8),
+                Text(
+                  "Click to view details",
+                  style: TextStyle(
+                      color: Colors.blue[600],
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500),
+                ),
+              ],
+              const SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Text(
+                    date,
+                    style: TextStyle(color: Colors.grey[400], fontSize: 12),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

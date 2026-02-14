@@ -1,136 +1,200 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:pjspaul_admin/view/widget/custom_toast.dart';
 import 'package:pjspaul_admin/view/widget/progressbar.dart';
 
-class OtherController extends GetxController{
-   RxBool isGo = true.obs;
+class OtherController extends GetxController {
+  RxBool isGo = true.obs;
   RxBool isShowAdd = false.obs;
+
   List<List<String>> list = [
-    ["Location"],
-    ["Location"],
-    ["TV Program Name", "delete"],
-    ["Name", "Email Address", "Phone", "Subject", "Message"],
-    ["Donor Name", "Contact Number", "Donation Amount", "Payment Method"],
+    ["Location", "Date", "Delete"],
+    ["Location", "Date", "Delete"],
+    ["TV Program Name", "Date", "Delete"],
+    ["Name", "Email Address", "Phone", "Subject", "Message", "Date", "Delete"],
+    [
+      "Donor Name",
+      "Contact Number",
+      "Donation Amount",
+      "Payment Method",
+      "Date",
+      "Delete"
+    ],
   ];
   RxInt selectedIndex = 0.obs;
 
   RxList<List<String>> listData = <List<String>>[].obs;
+  RxList<String> listId = <String>[].obs;
 
-  Future<void> getLifeChangingChurch() async {
-    isGo.value = false;
-    listData.clear();
-    final FirebaseFirestore firestore = FirebaseFirestore.instance;
-    firestore.collection('life_changing_church').get().then((snapshot) {
-      listData.clear();
-      snapshot.docs.forEach((doc) {
-        var data = doc.data();
-        listData.add([data["location"]]);
-      });
-      isGo.value = true;
-    });
-  }
-
-  Future<void> getPJSMinistries() async {
-    isGo.value = false;
-    listData.clear();
-    final FirebaseFirestore firestore = FirebaseFirestore.instance;
-    firestore.collection('pjs_ministies').get().then((snapshot) {
-      listData.clear();
-      snapshot.docs.forEach((doc) {
-        var data = doc.data();
-        listData.add([data["ministry_location"]]);
-      });
-      isGo.value = true;
-    });
+  String _formatDate(dynamic timestamp) {
+    if (timestamp == null) return 'N/A';
+    if (timestamp is Timestamp) {
+      return DateFormat('dd MMM yyyy, hh:mm a').format(timestamp.toDate());
+    }
+    if (timestamp is String) return timestamp;
+    return 'N/A';
   }
 
   final lifeTVProgram = GlobalKey<FormState>();
   TextEditingController tvProgramController = TextEditingController();
-  RxList<String> listId = <String>[].obs;
 
   Future<void> addTVProgram(BuildContext context) async {
     try {
       ProgressBar.instance.showProgressbar(context);
-      final FirebaseFirestore firestore = FirebaseFirestore.instance;
-      CollectionReference request = firestore.collection('life_tv_program');
-
-      await request.add({
+      await FirebaseFirestore.instance.collection('life_tv_program').add({
         'tv_program': tvProgramController.text,
+        'created_at': FieldValue.serverTimestamp(),
       });
       ProgressBar.instance.stopProgressBar(context);
-      // Get.back();
       CustomToast.instance.showMsg("Added Successfully");
     } catch (e) {
       ProgressBar.instance.stopProgressBar(context);
-      // Get.back();
-      print("Error $e");
+      debugPrint("Error $e");
       CustomToast.instance.showMsg("Something went wrong");
-    } finally{
+    } finally {
       tvProgramController.clear();
       getLifeTVProgram();
     }
   }
 
-  Future<void> getLifeTVProgram() async {
+  Future<void> deleteRecord(BuildContext context, int index) async {
+    final collectionMap = {
+      0: 'life_changing_church',
+      1: 'pjs_ministies',
+      2: 'life_tv_program',
+      3: 'email',
+      4: 'donation',
+    };
+    final collection = collectionMap[selectedIndex.value] ?? '';
+    try {
+      ProgressBar.instance.showProgressbar(context);
+      await FirebaseFirestore.instance
+          .collection(collection)
+          .doc(listId[index])
+          .delete();
+      ProgressBar.instance.stopProgressBar(context);
+      CustomToast.instance.showMsg("Delete successfully");
+    } catch (e) {
+      ProgressBar.instance.stopProgressBar(context);
+      CustomToast.instance.showMsg("Something went wrong");
+    } finally {
+      refreshCurrent();
+    }
+  }
+
+  void refreshCurrent() {
+    switch (selectedIndex.value) {
+      case 0:
+        getLifeChangingChurch();
+        break;
+      case 1:
+        getPJSMinistries();
+        break;
+      case 2:
+        getLifeTVProgram();
+        break;
+      case 3:
+        getEmailAddress();
+        break;
+      case 4:
+        getDontation();
+        break;
+    }
+  }
+
+  Future<void> getLifeChangingChurch() async {
     isGo.value = false;
     listData.clear();
-    final FirebaseFirestore firestore = FirebaseFirestore.instance;
-    firestore.collection('life_tv_program').get().then((snapshot) {
-      listData.clear();
-      snapshot.docs.forEach((doc) {
-        var data = doc.data();
-        listData.add([data["tv_program"], "delete"]);
-        listId.add(doc.id);
-      });
-    });
+    listId.clear();
+    final snapshot = await FirebaseFirestore.instance
+        .collection('life_changing_church')
+        .get();
+    for (var doc in snapshot.docs) {
+      var data = doc.data();
+      listId.add(doc.id);
+      listData.add(
+          [data["location"] ?? '', _formatDate(data["created_at"]), 'delete']);
+    }
     isGo.value = true;
   }
 
-  Future<void> deleteLifeTVProgram(BuildContext context, int index) async {
-  try {
-    ProgressBar.instance.showProgressbar(context);
-    await FirebaseFirestore.instance
-        .collection('life_tv_program') // Replace with your collection name
-        .doc(listId[index]) // Document ID
-        .delete();
-    ProgressBar.instance.stopProgressBar(context);
-    CustomToast.instance.showMsg("Delete successfully");
-  } catch (e) {
-    ProgressBar.instance.stopProgressBar(context);
-    CustomToast.instance.showMsg("Something went wrong");
-  } finally {
-    getLifeTVProgram();
+  Future<void> getPJSMinistries() async {
+    isGo.value = false;
+    listData.clear();
+    listId.clear();
+    final snapshot =
+        await FirebaseFirestore.instance.collection('pjs_ministies').get();
+    for (var doc in snapshot.docs) {
+      var data = doc.data();
+      listId.add(doc.id);
+      listData.add([
+        data["ministry_location"] ?? '',
+        _formatDate(data["created_at"]),
+        'delete'
+      ]);
+    }
+    isGo.value = true;
   }
-}
 
+  Future<void> getLifeTVProgram() async {
+    isGo.value = false;
+    listData.clear();
+    listId.clear();
+    final snapshot =
+        await FirebaseFirestore.instance.collection('life_tv_program').get();
+    for (var doc in snapshot.docs) {
+      var data = doc.data();
+      listId.add(doc.id);
+      listData.add([
+        data["tv_program"] ?? '',
+        _formatDate(data["created_at"]),
+        'delete'
+      ]);
+    }
+    isGo.value = true;
+  }
 
   Future<void> getEmailAddress() async {
     isGo.value = false;
     listData.clear();
-    final FirebaseFirestore firestore = FirebaseFirestore.instance;
-    firestore.collection('email').get().then((snapshot) {
-      listData.clear();
-      snapshot.docs.forEach((doc) {
-        var data = doc.data();
-        listData.add([data["name"], data["email"], data["phone"], data["subject"], data["message"]]);
-      });
-      isGo.value = true;
-    });
+    listId.clear();
+    final snapshot = await FirebaseFirestore.instance.collection('email').get();
+    for (var doc in snapshot.docs) {
+      var data = doc.data();
+      listId.add(doc.id);
+      listData.add([
+        data["name"] ?? '',
+        data["email"] ?? '',
+        data["phone"] ?? '',
+        data["subject"] ?? '',
+        data["message"] ?? '',
+        _formatDate(data["created_at"]),
+        'delete',
+      ]);
+    }
+    isGo.value = true;
   }
 
   Future<void> getDontation() async {
     isGo.value = false;
     listData.clear();
-    final FirebaseFirestore firestore = FirebaseFirestore.instance;
-    firestore.collection('donation').get().then((snapshot) {
-      listData.clear();
-      snapshot.docs.forEach((doc) {
-        var data = doc.data();
-        listData.add([data["donor_name"], data["contact"], data["amount"], "Razorpay"]);
-      });
-      isGo.value = true;
-    });
+    listId.clear();
+    final snapshot =
+        await FirebaseFirestore.instance.collection('donation').get();
+    for (var doc in snapshot.docs) {
+      var data = doc.data();
+      listId.add(doc.id);
+      listData.add([
+        data["donor_name"] ?? '',
+        data["contact"] ?? '',
+        data["amount"] ?? '',
+        "Razorpay",
+        _formatDate(data["created_at"]),
+        'delete',
+      ]);
+    }
+    isGo.value = true;
   }
 }

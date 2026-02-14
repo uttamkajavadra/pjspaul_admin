@@ -4,12 +4,14 @@ import 'package:pjspaul_admin/controller/beliver_registration/beliver_registrati
 import 'package:pjspaul_admin/controller/beliver_request_form/beliver_request_form_controller.dart';
 import 'package:pjspaul_admin/controller/beliver_spritual_content/beliver_spritual_content_controller.dart';
 import 'package:pjspaul_admin/controller/other/other_controller.dart';
+import 'package:pjspaul_admin/route/app_routes.dart';
 import 'package:pjspaul_admin/view/page/beliver_registration/beliver_registration_screen.dart';
 import 'package:pjspaul_admin/view/page/beliver_request_form/beliver_request_form_screen.dart';
 import 'package:pjspaul_admin/view/page/beliver_spritual_content/beliver_spritual_content_screen.dart';
 import 'package:pjspaul_admin/view/page/other/other_screen.dart';
 import 'package:pjspaul_admin/view/page/upload_image/upload_image_screen.dart';
 import 'package:pjspaul_admin/view/page/user/user_screen.dart';
+import 'package:pjspaul_admin/view/theme/app_theme.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -19,168 +21,379 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  BeliverSpritualContentController beliverSpritualContentController = Get.isRegistered<BeliverSpritualContentController>()
-      ? Get.find<BeliverSpritualContentController>()
-      : Get.put(BeliverSpritualContentController());
+  // Controllers
+  final BeliverSpritualContentController beliverSpritualContentController =
+      Get.put(BeliverSpritualContentController());
+  final BeliverRequestFormController beliverRequestFormController =
+      Get.put(BeliverRequestFormController());
+  final BeliverRegistrationController beliverRegistrationController =
+      Get.put(BeliverRegistrationController());
+  final OtherController otherController = Get.put(OtherController());
 
-  BeliverRequestFormController beliverRequestFormController =
-      Get.isRegistered<BeliverRequestFormController>() ? Get.find<BeliverRequestFormController>() : Get.put(BeliverRequestFormController());
-
-  BeliverRegistrationController beliverRegistrationController =
-      Get.isRegistered<BeliverRegistrationController>() ? Get.find<BeliverRegistrationController>() : Get.put(BeliverRegistrationController());
-
-  OtherController otherController = Get.isRegistered<OtherController>() ? Get.find<OtherController>() : Get.put(OtherController());
-
-  List<Map<String, dynamic>> list = [
-    {"title": "User", 'screen': UserScreen()},
-    {"title": "Upload Image Screen", "screen": UploadImageScreen()},
-    {"title": "Today's Blessing", "screen": BeliverSpritualContentScreen()},
-    {"title": "Life Changing Radio 24x7", "screen": BeliverSpritualContentScreen()},
-    {"title": "Life Changing Short Videos", "screen": BeliverSpritualContentScreen()},
-    {"title": "Donations", "screen": OtherScreen()},
-    {"title": "Life Changing Message Live", "screen": BeliverSpritualContentScreen()},
-    {"title": "Connect With Us", "screen": OtherScreen()},
-    {"title": "Life Changing Songs", "screen": BeliverSpritualContentScreen()},
-    {"title": "Upcoming Events", "screen": BeliverSpritualContentScreen()},
-    {"title": "My Prayer Request", "screen": BeliverRequestFormScreen()},
-    {"title": "My Testimonies", "screen": BeliverRequestFormScreen()},
-    {"title": "Pastor Appointment Request", "screen": BeliverRequestFormScreen()},
-    {"title": "Suggest/Feedback", "screen": BeliverRequestFormScreen()},
-    {"title": "Spiritual Guidance & Counselling Request", "screen": BeliverRequestFormScreen()},
-    {"title": "Cottage Prayer/Hospital Visit Request", "screen": BeliverRequestFormScreen()},
-    {"title": "Volunteer Enrollment Request", "screen": BeliverRequestFormScreen()},
-    {"title": "Youth Registration", "screen": BeliverRegistrationScreen()},
-    {"title": "Baptism Registration", "screen": BeliverRegistrationScreen()},
-    {"title": "Chain Prayer Registration", "screen": BeliverRegistrationScreen()},
-    {"title": "Holy Spirit Bible College Registration", "screen": BeliverRegistrationScreen()},
-    {"title": "Pastors & Leaders Registration", "screen": BeliverRegistrationScreen()},
-    {"title": "Businessman Registration", "screen": BeliverRegistrationScreen()},
-    {"title": "Doctor/Nurses/Technicians Registration", "screen": BeliverRegistrationScreen()},
-    // {"title": "Believers Spiritual Content", "screen": BeliverSpritualContentScreen()},
-    // {"title": "Believers Registrations", "screen": BeliverRegistrationScreen()},
-    // {"title": "Others", "screen": OtherScreen()},
+  // Menu Items
+  final List<Map<String, dynamic>> menuItems = [
+    {
+      "title": "Dashboard Users",
+      "icon": Icons.people_alt,
+      "screen": UserScreen()
+    },
+    {
+      "title": "Upload Gallery",
+      "icon": Icons.photo_library,
+      "screen": UploadImageScreen()
+    },
+    // Spiritual Content
+    {
+      "title": "Today's Blessing",
+      "icon": Icons.volunteer_activism,
+      "screen": BeliverSpritualContentScreen()
+    },
+    {
+      "title": "Radio 24x7",
+      "icon": Icons.radio,
+      "screen": BeliverSpritualContentScreen()
+    },
+    {
+      "title": "Short Videos",
+      "icon": Icons.video_library,
+      "screen": BeliverSpritualContentScreen()
+    },
+    {
+      "title": "Live Message",
+      "icon": Icons.live_tv,
+      "screen": BeliverSpritualContentScreen()
+    },
+    {
+      "title": "Songs",
+      "icon": Icons.music_note,
+      "screen": BeliverSpritualContentScreen()
+    },
+    {
+      "title": "Upcoming Events",
+      "icon": Icons.event,
+      "screen": BeliverSpritualContentScreen()
+    },
+    // Requests
+    {
+      "title": "Prayer Request",
+      "icon": Icons.verified_user,
+      "screen": BeliverRequestFormScreen()
+    },
+    {
+      "title": "Testimonies",
+      "icon": Icons.message,
+      "screen": BeliverRequestFormScreen()
+    },
+    {
+      "title": "Pastor Appointment",
+      "icon": Icons.schedule,
+      "screen": BeliverRequestFormScreen()
+    },
+    {
+      "title": "Feedback",
+      "icon": Icons.feedback,
+      "screen": BeliverRequestFormScreen()
+    },
+    {
+      "title": "Counseling",
+      "icon": Icons.support_agent,
+      "screen": BeliverRequestFormScreen()
+    },
+    {
+      "title": "Cottage Prayer",
+      "icon": Icons.home_work,
+      "screen": BeliverRequestFormScreen()
+    },
+    {
+      "title": "Volunteer",
+      "icon": Icons.handshake,
+      "screen": BeliverRequestFormScreen()
+    },
+    // Registrations
+    {
+      "title": "Youth Reg.",
+      "icon": Icons.child_care,
+      "screen": BeliverRegistrationScreen()
+    },
+    {
+      "title": "Baptism Reg.",
+      "icon": Icons.water_drop,
+      "screen": BeliverRegistrationScreen()
+    },
+    {
+      "title": "Chain Prayer",
+      "icon": Icons.link,
+      "screen": BeliverRegistrationScreen()
+    },
+    {
+      "title": "Bible College",
+      "icon": Icons.school,
+      "screen": BeliverRegistrationScreen()
+    },
+    {
+      "title": "Leaders Reg.",
+      "icon": Icons.person_pin,
+      "screen": BeliverRegistrationScreen()
+    },
+    {
+      "title": "Business Reg.",
+      "icon": Icons.business_center,
+      "screen": BeliverRegistrationScreen()
+    },
+    {
+      "title": "Medical Reg.",
+      "icon": Icons.medical_services,
+      "screen": BeliverRegistrationScreen()
+    },
+    // Other
+    {
+      "title": "Donations",
+      "icon": Icons.monetization_on,
+      "screen": OtherScreen()
+    },
+    {"title": "Connect/Email", "icon": Icons.email, "screen": OtherScreen()},
   ];
+
   RxInt selectedIndex = 0.obs;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppTheme.backgroundColor,
       body: Row(
         children: [
+          // Sidebar
           Container(
-            width: 200,
-            height: double.infinity,
-            color: Colors.black,
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  const SizedBox(
-                    height: 15,
+            width: 260,
+            color: AppTheme.surfaceColor,
+            child: Column(
+              children: [
+                _buildSidebarHeader(),
+                Expanded(
+                  child: ListView.separated(
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    itemCount: menuItems.length,
+                    separatorBuilder: (context, index) =>
+                        const Divider(height: 1, indent: 16, endIndent: 16),
+                    itemBuilder: (context, index) => _buildMenuItem(index),
                   ),
-                  ListView.builder(
-                      shrinkWrap: true,
-                      physics: NeverScrollableScrollPhysics(),
-                      padding: EdgeInsets.only(bottom: 100),
-                      itemCount: list.length,
-                      itemBuilder: (context, index) {
-                        return Obx(() {
-                          return GestureDetector(
-                            onTap: () {
-                              // selectedIndex.value = index;
-                              // beliverSpritualContentController.listData.clear();
-                              // beliverSpritualContentController.listId.clear();
-                              // print(beliverSpritualContentController.isGo.value);
-                              // selectedIndex.value = index;
-                              if (beliverRequestFormController.isGo.value == true &&
-                                  beliverRegistrationController.isGo.value == true &&
-                                  beliverSpritualContentController.isGo.value == true &&
-                                  otherController.isGo.value == true) {
-                                selectedIndex.value = index;
-                                if (selectedIndex.value == 0) {
-                                } else if (selectedIndex.value == 1) {
-                                } else if (selectedIndex.value == 2) {
-                                  beliverSpritualContentController.selectedIndex.value = 1;
-                                } else if (selectedIndex.value == 3) {
-                                  beliverSpritualContentController.selectedIndex.value = 0;
-                                } else if (selectedIndex.value == 4) {
-                                  beliverSpritualContentController.selectedIndex.value = 3;
-                                } else if (selectedIndex.value == 5) {
-                                  otherController.selectedIndex.value = 4;
-                                } else if (selectedIndex.value == 6) {
-                                  beliverSpritualContentController.selectedIndex.value = 4;
-                                } else if (selectedIndex.value == 7) {
-                                  otherController.selectedIndex.value = 3;
-                                } else if (selectedIndex.value == 8) {
-                                  beliverSpritualContentController.selectedIndex.value = 5;
-                                } else if (selectedIndex.value == 9) {
-                                  beliverSpritualContentController.selectedIndex.value = 2;
-                                } else if (selectedIndex.value == 10) {
-                                  beliverRequestFormController.selectedIndex.value = 0;
-                                } else if (selectedIndex.value == 11) {
-                                  beliverRequestFormController.selectedIndex.value = 1;
-                                } else if (selectedIndex.value == 12) {
-                                  beliverRequestFormController.selectedIndex.value = 5;
-                                } else if (selectedIndex.value == 13) {
-                                  beliverRequestFormController.selectedIndex.value = 4;
-                                } else if (selectedIndex.value == 14) {
-                                  beliverRequestFormController.selectedIndex.value = 3;
-                                } else if (selectedIndex.value == 15) {
-                                  beliverRequestFormController.selectedIndex.value = 2;
-                                } else if (selectedIndex.value == 16) {
-                                  beliverRequestFormController.selectedIndex.value = 7;
-                                } else if (selectedIndex.value == 17) {
-                                  beliverRegistrationController.selectedIndex.value = 0;
-                                } else if (selectedIndex.value == 18) {
-                                  beliverRegistrationController.selectedIndex.value = 4;
-                                } else if (selectedIndex.value == 19) {
-                                  beliverRegistrationController.selectedIndex.value = 6;
-                                } else if (selectedIndex.value == 20) {
-                                  beliverRegistrationController.selectedIndex.value = 2;
-                                } else if (selectedIndex.value == 21) {
-                                  beliverRegistrationController.selectedIndex.value = 1;
-                                } else if (selectedIndex.value == 22) {
-                                  beliverRegistrationController.selectedIndex.value = 3;
-                                } else if (selectedIndex.value == 23) {
-                                  beliverRegistrationController.selectedIndex.value = 5;
-                                }
-                                print(selectedIndex.value );
-                              }
-                            },
-                            child: Container(
-                              margin: EdgeInsets.symmetric(vertical: 5, horizontal: 4),
-                              padding: EdgeInsets.symmetric(vertical: 5, horizontal: 4),
-                              decoration: BoxDecoration(
-                                  color: (selectedIndex.value == index) ? Colors.amber : null, borderRadius: BorderRadius.all(Radius.circular(4))),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      list[index]["title"],
-                                      style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w500),
-                                    ),
-                                  ),
-                                  Icon(
-                                    Icons.arrow_forward_ios_rounded,
-                                    color: Colors.white,
-                                    size: 14,
-                                  )
-                                ],
-                              ),
-                            ),
-                          );
-                        });
-                      })
-                ],
-              ),
+                ),
+                _buildLogoutButton(),
+              ],
             ),
           ),
-          Expanded(child: Obx(() {
-            return Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: list[selectedIndex.value]["screen"],
-            );
-          }))
+          // Main Content
+          Expanded(
+            child: Column(
+              children: [
+                _buildTopHeader(),
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.all(20),
+                    color: AppTheme.surfaceColor,
+                    child: Obx(() => menuItems[selectedIndex.value]["screen"]),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
+  }
+
+  Widget _buildSidebarHeader() {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      color: AppTheme.primaryColor,
+      child: Row(
+        children: [
+          const Icon(Icons.admin_panel_settings, color: Colors.white, size: 28),
+          const SizedBox(width: 12),
+          Text(
+            "Admin Panel",
+            style: AppTheme.titleMedium.copyWith(color: Colors.white),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMenuItem(int index) {
+    return Obx(() {
+      final isSelected = selectedIndex.value == index;
+      return ListTile(
+        leading: Icon(
+          menuItems[index]["icon"],
+          color: isSelected ? AppTheme.primaryColor : AppTheme.textSecondary,
+        ),
+        title: Text(
+          menuItems[index]["title"],
+          style: isSelected
+              ? AppTheme.bodyLarge.copyWith(
+                  color: AppTheme.primaryColor, fontWeight: FontWeight.w600)
+              : AppTheme.bodyMedium,
+        ),
+        selected: isSelected,
+        selectedTileColor: AppTheme.primaryColor.withOpacity(0.05),
+        onTap: () => _handleMenuSelection(index),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)),
+      );
+    });
+  }
+
+  Widget _buildLogoutButton() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: const BoxDecoration(
+        border: Border(top: BorderSide(color: Color(0xFFE2E8F0))),
+      ),
+      child: ListTile(
+        leading: const Icon(Icons.logout, color: AppTheme.errorColor),
+        title: Text(
+          "Logout",
+          style: AppTheme.bodyMedium.copyWith(
+              color: AppTheme.errorColor, fontWeight: FontWeight.w600),
+        ),
+        onTap: () {
+          Get.offAllNamed(AppRoutes.login);
+        },
+      ),
+    );
+  }
+
+  Widget _buildTopHeader() {
+    return Container(
+      height: 70,
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceColor,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.02),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Obx(() => Text(
+                menuItems[selectedIndex.value]["title"],
+                style: AppTheme.displayMedium.copyWith(fontSize: 20),
+              )),
+          const Spacer(),
+          CircleAvatar(
+            backgroundColor: AppTheme.backgroundColor,
+            child: const Icon(Icons.person, color: AppTheme.textSecondary),
+          ),
+          const SizedBox(width: 12),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text("Administrator",
+                  style:
+                      AppTheme.bodyLarge.copyWith(fontWeight: FontWeight.w600)),
+              Text("pjspaulministry@gmail.com",
+                  style: AppTheme.bodyMedium.copyWith(fontSize: 12)),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _handleMenuSelection(int index) {
+    // Map index to specific logic for detailed controller setup
+    // Note: Keeping existing logic structure but cleaned up
+    selectedIndex.value = index;
+
+    // Reset controllers or set specific tabs based on index
+    // Spiritual Content
+    if (index == 2)
+      _setContentTab(
+          1, () => beliverSpritualContentController.getTodayBlessing());
+    else if (index == 3)
+      _setContentTab(0, () => beliverSpritualContentController.getRadioLink());
+    else if (index == 4)
+      _setContentTab(
+          3, () => beliverSpritualContentController.getShortMessage());
+    else if (index == 5)
+      _setContentTab(
+          4, () => beliverSpritualContentController.getLifeMessage());
+    else if (index == 6)
+      _setContentTab(5, () => beliverSpritualContentController.getLifeSong());
+    else if (index == 7)
+      _setContentTab(
+          2, () => beliverSpritualContentController.getUpcomingEvent());
+
+    // Requests
+    else if (index == 8)
+      _setRequestTab(0, () => beliverRequestFormController.getPrayerRequest());
+    else if (index == 9)
+      _setRequestTab(
+          1, () => beliverRequestFormController.getTestimonyRequest());
+    else if (index == 10)
+      _setRequestTab(5, () => beliverRequestFormController.getPastorRequest());
+    else if (index == 11)
+      _setRequestTab(
+          4, () => beliverRequestFormController.getFeedbackRequest());
+    else if (index == 12)
+      _setRequestTab(
+          3, () => beliverRequestFormController.getCounselingRequest());
+    else if (index == 13)
+      _setRequestTab(2, () => beliverRequestFormController.getCottagePrayer());
+    else if (index == 14)
+      _setRequestTab(
+          7, () => beliverRequestFormController.getVolunteerEnrollment());
+
+    // Registrations
+    else if (index == 15)
+      _setRegistrationTab(
+          0, () => beliverRegistrationController.getYouthRegistration());
+    else if (index == 16)
+      _setRegistrationTab(
+          4, () => beliverRegistrationController.getBaptismRegister());
+    else if (index == 17)
+      _setRegistrationTab(
+          6, () => beliverRegistrationController.getChainPrayer());
+    else if (index == 18)
+      _setRegistrationTab(
+          2, () => beliverRegistrationController.getCollegeRegister());
+    else if (index == 19)
+      _setRegistrationTab(
+          1, () => beliverRegistrationController.getLeaderRegistration());
+    else if (index == 20)
+      _setRegistrationTab(
+          3, () => beliverRegistrationController.getBusinessRegister());
+    else if (index == 21)
+      _setRegistrationTab(
+          5, () => beliverRegistrationController.getDoctorRegister());
+
+    // Other
+    else if (index == 22) {
+      otherController.selectedIndex.value = 4;
+      otherController.getDontation();
+    } else if (index == 23) {
+      otherController.selectedIndex.value = 3;
+      otherController.getEmailAddress();
+    }
+  }
+
+  void _setContentTab(int tabIndex, Function fetchData) {
+    beliverSpritualContentController.selectedIndex.value = tabIndex;
+    fetchData();
+  }
+
+  void _setRequestTab(int tabIndex, Function fetchData) {
+    beliverRequestFormController.selectedIndex.value = tabIndex;
+    fetchData();
+  }
+
+  void _setRegistrationTab(int tabIndex, Function fetchData) {
+    beliverRegistrationController.selectedIndex.value = tabIndex;
+    fetchData();
   }
 }

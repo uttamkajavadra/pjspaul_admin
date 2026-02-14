@@ -22,11 +22,11 @@ class _BeliverRequestFormScreenState extends State<BeliverRequestFormScreen> {
   @override
   void initState() {
     super.initState();
+    controller.refreshCurrent();
   }
 
   @override
   Widget build(BuildContext context) {
-    controller.refreshCurrent();
     return Scaffold(
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
@@ -66,21 +66,23 @@ class _BeliverRequestFormScreenState extends State<BeliverRequestFormScreen> {
     for (int i = 0; i < row.length - 2; i++) {
       if (i < headers.length) {
         String val = row[i];
+        bool isMedia = false;
         // Simple media detection
         if (val.startsWith('http')) {
-          if (val.contains('youtube') || val.endsWith('.mp4')) {
+          String path =
+              Uri.tryParse(val)?.path.toLowerCase() ?? val.toLowerCase();
+          if (val.contains('youtube') || path.endsWith('.mp4')) {
             videoUrl = val;
-          } else if (val.endsWith('.jpg') ||
-              val.endsWith('.png') ||
-              val.endsWith('.jpeg')) {
+            isMedia = true;
+          } else if (path.endsWith('.jpg') ||
+              path.endsWith('.png') ||
+              path.endsWith('.jpeg')) {
             imageUrl = val;
-          } else {
-            // Fallback or just add to details?
-            // Let's add to details if not identified or just assign to imageUrl as fallback (safe?)
-            // Or just leave it in details
-            details[headers[i]] = val;
+            isMedia = true;
           }
-        } else {
+        }
+
+        if (!isMedia) {
           details[headers[i]] = val;
         }
       }

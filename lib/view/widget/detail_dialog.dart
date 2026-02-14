@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pjspaul_admin/view/theme/app_theme.dart';
 import 'package:pjspaul_admin/view/widget/media_cell_widget.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class DetailDialog extends StatelessWidget {
   final String title;
@@ -107,6 +108,7 @@ class DetailDialog extends StatelessWidget {
   }
 
   Widget _buildDetailRow(MapEntry<String, String> entry) {
+    bool isUrl = entry.value.startsWith('http');
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: Row(
@@ -121,10 +123,29 @@ class DetailDialog extends StatelessWidget {
             ),
           ),
           Expanded(
-            child: Text(
-              entry.value.isEmpty ? "-" : entry.value,
-              style: AppTheme.bodyLarge,
-            ),
+            child: isUrl
+                ? Align(
+                    alignment: Alignment.centerLeft,
+                    child: TextButton.icon(
+                      onPressed: () async {
+                        final Uri url = Uri.parse(entry.value);
+                        if (!await launchUrl(url)) {
+                          debugPrint('Could not launch $url');
+                        }
+                      },
+                      icon: const Icon(Icons.link, size: 18),
+                      label: const Text("View Link"),
+                      style: TextButton.styleFrom(
+                        padding: EdgeInsets.zero,
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        alignment: Alignment.centerLeft,
+                      ),
+                    ),
+                  )
+                : Text(
+                    entry.value.isEmpty ? "-" : entry.value,
+                    style: AppTheme.bodyLarge,
+                  ),
           ),
         ],
       ),

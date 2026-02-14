@@ -36,27 +36,25 @@ class _BeliverSpritualContentScreenState
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (controller.selectedIndex.value == 0) {
+        await controller.getRadioLink();
+      } else if (controller.selectedIndex.value == 1) {
+        await controller.getTodayBlessing();
+      } else if (controller.selectedIndex.value == 2) {
+        await controller.getUpcomingEvent();
+      } else if (controller.selectedIndex.value == 3) {
+        await controller.getShortMessage();
+      } else if (controller.selectedIndex.value == 4) {
+        await controller.getLifeMessage();
+      } else if (controller.selectedIndex.value == 5) {
+        await controller.getLifeSong();
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      if (ModalRoute.of(context)?.isCurrent ?? false) {
-        if (controller.selectedIndex.value == 0) {
-          await controller.getRadioLink();
-        } else if (controller.selectedIndex.value == 1) {
-          await controller.getTodayBlessing();
-        } else if (controller.selectedIndex.value == 2) {
-          await controller.getUpcomingEvent();
-        } else if (controller.selectedIndex.value == 3) {
-          await controller.getShortMessage();
-        } else if (controller.selectedIndex.value == 4) {
-          await controller.getLifeMessage();
-        } else if (controller.selectedIndex.value == 5) {
-          await controller.getLifeSong();
-        }
-      }
-    });
     return Scaffold(
       backgroundColor: Colors.white,
       body: Column(

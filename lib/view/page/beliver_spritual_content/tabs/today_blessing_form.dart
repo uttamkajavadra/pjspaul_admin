@@ -7,86 +7,106 @@ import 'package:pjspaul_admin/view/widget/custom_text_form_field.dart';
 import 'package:pjspaul_admin/view/widget/custom_toast.dart';
 import 'package:pjspaul_admin/view/widget/custom_upload_file.dart';
 import 'package:pjspaul_admin/view/widget/custom_yes_no.dart';
+import 'package:pjspaul_admin/view/widget/form_container.dart';
 
 class TodayBlessingForm extends StatelessWidget {
   const TodayBlessingForm({super.key});
 
   @override
   Widget build(BuildContext context) {
-    BeliverSpritualContentController controller = Get.isRegistered<BeliverSpritualContentController>()
-        ? Get.find<BeliverSpritualContentController>()
-        : Get.put(BeliverSpritualContentController());
+    BeliverSpritualContentController controller =
+        Get.isRegistered<BeliverSpritualContentController>()
+            ? Get.find<BeliverSpritualContentController>()
+            : Get.put(BeliverSpritualContentController());
 
-    return Form(
-      key: controller.blessingForm,
-      child: Column(
-        children: [
-          const SizedBox(
-            height: 20,
-          ),
-          CustomTextFormField(
-              controller: controller.blessingController,
-              labelText: "Blessing Text",
-              validator: (value) => Validator.validateNull("Blessing Text", value)),
-          const SizedBox(
-            height: 20,
-          ),
-          Obx(() {
-            return CustomUploadFile(
-              onTap: () {
-                controller.pickImageFile();
-              },
-              selectedFile: controller.selectedImageFile.value,
-              uploadText: "Upload Image",
-              selectedText: "Image Selected",
-            );
-          }),
-          const SizedBox(
-            height: 20,
-          ),
-          Obx(
-            () {
-              return CustomYesNo(
-                isYoutube: controller.isYoutube.value, 
-                onTap: (status){
-                  controller.isYoutube.value = status;
-                  controller.youtubeVideoController.text = "";
-                });
-            }
-          ),
-          const SizedBox(height: 20,),
-          Obx(() {
-            if(controller.isYoutube.value){
-              return CustomTextFormField(
-              controller: controller.youtubeVideoController,
-              labelText: "Youtube Link",
-              validator: (value) => Validator.validateNull("Youtube Link", value));
-            }
-            return CustomUploadFile(
-              onTap: () {
-                controller.pickFile();
-              },
-              selectedFile: controller.selectedFile.value,
-              uploadText: "Upload Video",
-              selectedText: "Video Selected",
-            );
-          }),
-          
-          const SizedBox(
-            height: 20,
-          ),
-          CustomElevatedButton(
-              onPressed: () {
-                if (controller.blessingForm.currentState!.validate()) {
-                  if ((controller.youtubeVideoController.text.isNotEmpty || controller.selectedFile.value != null) && controller.selectedImageFile.value != null) {
-                    controller.addTodayBlessing(context);
-                  } else {
-                    CustomToast.instance.showMsg("Please fill all the details");
-                  }
-                }
-              },
-              buttonText: "ADD"),
-        ],
+    return FormContainer(
+      title: "Add Today's Blessing",
+      child: Form(
+        key: controller.blessingForm,
+        child: Column(
+          children: [
+            CustomTextFormField(
+                controller: controller.blessingController,
+                labelText: "Blessing Text",
+                validator: (value) =>
+                    Validator.validateNull("Blessing Text", value)),
+            const SizedBox(
+              height: 24,
+            ),
+            Obx(() {
+              return CustomUploadFile(
+                onTap: () {
+                  controller.pickImageFile();
+                },
+                selectedFile: controller.selectedImageFile.value,
+                uploadText: "Click to Upload Image",
+                selectedText: "Image Selected",
+              );
+            }),
+            const SizedBox(
+              height: 24,
+            ),
+            Obx(() {
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text("Video Source",
+                      style:
+                          TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+                  const SizedBox(height: 8),
+                  CustomYesNo(
+                      isYoutube: controller.isYoutube.value,
+                      onTap: (status) {
+                        controller.isYoutube.value = status;
+                        controller.youtubeVideoController.text = "";
+                      }),
+                ],
+              );
+            }),
+            const SizedBox(
+              height: 24,
+            ),
+            Obx(() {
+              if (controller.isYoutube.value) {
+                return CustomTextFormField(
+                    controller: controller.youtubeVideoController,
+                    labelText: "Youtube Link",
+                    prefixIcon: const Icon(Icons.link),
+                    validator: (value) =>
+                        Validator.validateNull("Youtube Link", value));
+              }
+              return CustomUploadFile(
+                onTap: () {
+                  controller.pickFile();
+                },
+                selectedFile: controller.selectedFile.value,
+                uploadText: "Click to Upload Video",
+                selectedText: "Video Selected",
+              );
+            }),
+            const SizedBox(
+              height: 32,
+            ),
+            SizedBox(
+              width: 200,
+              height: 48,
+              child: CustomElevatedButton(
+                  onPressed: () {
+                    if (controller.blessingForm.currentState!.validate()) {
+                      if ((controller.youtubeVideoController.text.isNotEmpty ||
+                              controller.selectedFile.value != null) &&
+                          controller.selectedImageFile.value != null) {
+                        controller.addTodayBlessing(context);
+                      } else {
+                        CustomToast.instance
+                            .showMsg("Please fill all the details");
+                      }
+                    }
+                  },
+                  buttonText: "Publish Blessing"),
+            ),
+          ],
+        ),
       ),
     );
   }

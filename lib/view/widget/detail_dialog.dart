@@ -76,41 +76,11 @@ class DetailDialog extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    if (imageUrl != null && imageUrl!.isNotEmpty) ...[
-                      Center(
-                        child: Container(
-                          constraints: const BoxConstraints(maxHeight: 300),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: Colors.grey.shade300),
-                          ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
-                            child: MediaCellWidget(url: imageUrl!),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                    ],
-                    if (videoUrl != null && videoUrl!.isNotEmpty) ...[
-                      Center(
-                        child: Container(
-                          constraints: const BoxConstraints(maxHeight: 300),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: Colors.grey.shade300),
-                          ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
-                            child: MediaCellWidget(
-                                url: videoUrl!,
-                                videoType: videoType), // Pass videoType
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                    ],
                     ...data.entries.map((entry) => _buildDetailRow(entry)),
+                    if (imageUrl != null && imageUrl!.isNotEmpty)
+                      _buildMediaRow("Image", imageUrl!, null),
+                    if (videoUrl != null && videoUrl!.isNotEmpty)
+                      _buildMediaRow("Video", videoUrl!, videoType),
                   ],
                 ),
               ),
@@ -154,6 +124,34 @@ class DetailDialog extends StatelessWidget {
             child: Text(
               entry.value.isEmpty ? "-" : entry.value,
               style: AppTheme.bodyLarge,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMediaRow(String label, String url, String? type) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 140,
+            child: Text(
+              label,
+              style: AppTheme.bodyMedium.copyWith(
+                  fontWeight: FontWeight.w600, color: AppTheme.textSecondary),
+            ),
+          ),
+          Expanded(
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: MediaCellWidget(
+                url: url,
+                videoType: type,
+              ),
             ),
           ),
         ],

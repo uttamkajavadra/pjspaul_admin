@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pjspaul_admin/utils/youtube_helper.dart';
+import 'package:pjspaul_admin/view/theme/app_theme.dart';
 import 'package:pjspaul_admin/view/widget/video_preview_dialog.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -55,12 +56,6 @@ class MediaCellWidget extends StatelessWidget {
           color: Colors.blue.shade700,
           onTap: () => VideoPreviewDialog.show(context, url, false),
         ),
-        _buildChip(
-          icon: Icons.download,
-          label: 'Download',
-          color: Colors.green.shade700,
-          onTap: () => _openUrl(url),
-        ),
       ]);
     }
 
@@ -70,12 +65,6 @@ class MediaCellWidget extends StatelessWidget {
           icon: Icons.audiotrack,
           label: 'Play',
           color: Colors.purple.shade700,
-          onTap: () => _openUrl(url),
-        ),
-        _buildChip(
-          icon: Icons.download,
-          label: 'Download',
-          color: Colors.green.shade700,
           onTap: () => _openUrl(url),
         ),
       ]);
@@ -89,12 +78,6 @@ class MediaCellWidget extends StatelessWidget {
           color: Colors.black87,
           onTap: () => _showImageDialog(context, url),
         ),
-        _buildChip(
-          icon: Icons.download,
-          label: 'Download',
-          color: Colors.green.shade700,
-          onTap: () => _openUrl(url),
-        ),
       ]);
     }
 
@@ -104,12 +87,6 @@ class MediaCellWidget extends StatelessWidget {
         icon: Icons.open_in_new,
         label: 'Open',
         color: Colors.black87,
-        onTap: () => _openUrl(url),
-      ),
-      _buildChip(
-        icon: Icons.download,
-        label: 'Download',
-        color: Colors.green.shade700,
         onTap: () => _openUrl(url),
       ),
     ]);
@@ -177,18 +154,9 @@ class MediaCellWidget extends StatelessWidget {
                     'Image Preview',
                     style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
                   ),
-                  Row(
-                    children: [
-                      IconButton(
-                        onPressed: () => _openUrl(imageUrl),
-                        icon: const Icon(Icons.download),
-                        tooltip: 'Download',
-                      ),
-                      IconButton(
-                        onPressed: () => Navigator.of(context).pop(),
-                        icon: const Icon(Icons.close),
-                      ),
-                    ],
+                  IconButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    icon: const Icon(Icons.close),
                   ),
                 ],
               ),
@@ -207,6 +175,7 @@ class MediaCellWidget extends StatelessWidget {
                         height: 300,
                         child: Center(
                           child: CircularProgressIndicator(
+                            color: AppTheme.primaryColor,
                             value: progress.expectedTotalBytes != null
                                 ? progress.cumulativeBytesLoaded /
                                     (progress.expectedTotalBytes ?? 1)

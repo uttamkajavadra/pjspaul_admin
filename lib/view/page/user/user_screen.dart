@@ -28,20 +28,20 @@ class _UserScreenState extends State<UserScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(height: 20),
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.0),
-            child: Text(
-              "Login User",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 20),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16.0),
+              child: Text(
+                "Login User",
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
+              ),
             ),
-          ),
-          const SizedBox(height: 20),
-          Expanded(
-            child: Obx(() {
+            const SizedBox(height: 20),
+            Obx(() {
               return (controller.listData.isEmpty)
                   ? const Center(child: Text("No data found"))
                   : ResponsiveDataGrid(
@@ -49,8 +49,8 @@ class _UserScreenState extends State<UserScreen> {
                       itemBuilder: (context, index) => _buildCard(index),
                     );
             }),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

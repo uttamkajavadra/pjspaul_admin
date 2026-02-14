@@ -6,7 +6,6 @@ import 'package:pjspaul_admin/view/widget/custom_toast.dart';
 import 'package:pjspaul_admin/view/widget/custom_upload_file.dart';
 import 'package:pjspaul_admin/view/theme/app_theme.dart';
 import 'package:pjspaul_admin/view/widget/delete_confirmation_dialog.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class UploadImageScreen extends StatefulWidget {
   const UploadImageScreen({super.key});
@@ -52,14 +51,14 @@ class _UploadImageScreenState extends State<UploadImageScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    "Upload New Image",
-                    style: AppTheme.titleLarge.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.blueGrey.shade800,
-                    ),
-                  ),
-                  const SizedBox(height: 24),
+                  // Text(
+                  //   "Upload New Image",
+                  //   style: AppTheme.titleLarge.copyWith(
+                  //     fontWeight: FontWeight.bold,
+                  //     color: Colors.blueGrey.shade800,
+                  //   ),
+                  // ),
+                  // const SizedBox(height: 24),
                   Obx(() {
                     return CustomUploadFile(
                       onTap: () {
@@ -70,7 +69,7 @@ class _UploadImageScreenState extends State<UploadImageScreen> {
                       selectedText: "Image Ready to Upload",
                     );
                   }),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 12),
                   SizedBox(
                     width: double.infinity,
                     height: 48,
@@ -89,7 +88,7 @@ class _UploadImageScreenState extends State<UploadImageScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 30),
+            const SizedBox(height: 12),
             Obx(() {
               return GridView.builder(
                 shrinkWrap: true,
@@ -123,6 +122,7 @@ class _UploadImageScreenState extends State<UploadImageScreen> {
                                   if (loadingProgress == null) return child;
                                   return Center(
                                     child: CircularProgressIndicator(
+                                      color: AppTheme.primaryColor,
                                       value:
                                           loadingProgress.expectedTotalBytes !=
                                                   null
@@ -150,21 +150,6 @@ class _UploadImageScreenState extends State<UploadImageScreen> {
                           const SizedBox(height: 8),
                           Row(
                             children: [
-                              Expanded(
-                                child: CustomElevatedButton(
-                                  onPressed: () async {
-                                    final url =
-                                        controller.imageList[index]["image"];
-                                    final uri = Uri.parse(url);
-                                    if (await canLaunchUrl(uri)) {
-                                      await launchUrl(uri,
-                                          mode: LaunchMode.externalApplication);
-                                    }
-                                  },
-                                  buttonText: "Download",
-                                ),
-                              ),
-                              const SizedBox(width: 8),
                               Expanded(
                                 child: ElevatedButton(
                                   onPressed: () {

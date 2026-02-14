@@ -36,6 +36,8 @@ class ResponsiveDataGrid extends StatelessWidget {
 
         return GridView.builder(
           padding: const EdgeInsets.all(16),
+          physics: NeverScrollableScrollPhysics(),
+          shrinkWrap: true,
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: crossAxisCount,
             crossAxisSpacing: 16,

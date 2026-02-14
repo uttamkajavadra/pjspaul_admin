@@ -102,38 +102,38 @@ class _BeliverSpritualContentScreenState
               );
             }
             return Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 20),
-                  SizedBox(
-                    width: 100,
-                    child: CustomElevatedButton(
-                        onPressed: () {
-                          controller.isShowAdd.value =
-                              !controller.isShowAdd.value;
-                        },
-                        buttonText:
-                            (controller.isShowAdd.value) ? "Hide" : "+ Add"),
-                  ),
-                  if (controller.selectedIndex.value == 1 &&
-                      controller.isShowAdd.value == true)
-                    TodayBlessingForm(),
-                  if (controller.selectedIndex.value == 2 &&
-                      controller.isShowAdd.value == true)
-                    UpcomingEventForm(),
-                  if (controller.selectedIndex.value == 3 &&
-                      controller.isShowAdd.value == true)
-                    ShortMessageForm(),
-                  if (controller.selectedIndex.value == 4 &&
-                      controller.isShowAdd.value == true)
-                    LifeChangingMessageForm(),
-                  if (controller.selectedIndex.value == 5 &&
-                      controller.isShowAdd.value == true)
-                    LifeChangingSongForm(),
-                  const SizedBox(height: 20),
-                  Expanded(
-                    child: Obx(() {
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 20),
+                    SizedBox(
+                      width: 100,
+                      child: CustomElevatedButton(
+                          onPressed: () {
+                            controller.isShowAdd.value =
+                                !controller.isShowAdd.value;
+                          },
+                          buttonText:
+                              (controller.isShowAdd.value) ? "Hide" : "+ Add"),
+                    ),
+                    if (controller.selectedIndex.value == 1 &&
+                        controller.isShowAdd.value == true)
+                      TodayBlessingForm(),
+                    if (controller.selectedIndex.value == 2 &&
+                        controller.isShowAdd.value == true)
+                      UpcomingEventForm(),
+                    if (controller.selectedIndex.value == 3 &&
+                        controller.isShowAdd.value == true)
+                      ShortMessageForm(),
+                    if (controller.selectedIndex.value == 4 &&
+                        controller.isShowAdd.value == true)
+                      LifeChangingMessageForm(),
+                    if (controller.selectedIndex.value == 5 &&
+                        controller.isShowAdd.value == true)
+                      LifeChangingSongForm(),
+                    const SizedBox(height: 20),
+                    Obx(() {
                       if (!controller.isGo.value) {
                         return const Center(child: CircularProgressIndicator());
                       }
@@ -145,8 +145,8 @@ class _BeliverSpritualContentScreenState
                         itemBuilder: (context, index) => _buildCard(index),
                       );
                     }),
-                  ),
-                ],
+                  ],
+                ),
               ),
             );
           }),

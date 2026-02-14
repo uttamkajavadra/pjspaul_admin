@@ -28,53 +28,32 @@ class _LoginScreenState extends State<LoginScreen> {
             Expanded(
               flex: 1,
               child: Container(
-                decoration: BoxDecoration(
-                  color: AppTheme.primaryColor.withOpacity(0.05),
-                  image: const DecorationImage(
-                    image: NetworkImage(
-                        "https://images.unsplash.com/photo-1507692049790-de58293a4697?q=80&w=2940&auto=format&fit=crop"), // Placeholder high-quality abstract image or church image
-                    fit: BoxFit.cover,
-                    opacity: 0.8,
-                  ),
-                ),
-                child: Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Colors.black.withOpacity(0.3),
-                        Colors.black.withOpacity(0.7),
-                      ],
-                    ),
-                  ),
-                  padding: const EdgeInsets.all(48),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Text(
-                        "PJS Paul Ministries",
-                        style: AppTheme.displayMedium.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        "\"For I am not ashamed of the gospel, because it is the power of God that brings salvation to everyone who believes.\"\n- Romans 1:16",
-                        style: AppTheme.titleMedium.copyWith(
-                          color: Colors.white.withOpacity(0.9),
-                          height: 1.5,
-                          fontStyle: FontStyle.italic,
-                        ),
-                      ),
-                      const SizedBox(height: 48),
-                    ],
-                  ),
+                height: double.infinity,
+                color: AppTheme.primaryColor.withOpacity(0.05),
+                child: Image.network(
+                  "https://www.pjspaul.org/wp-content/uploads/2020/12/sir_about.jpg",
+                  webHtmlElementStrategy: WebHtmlElementStrategy.prefer,
+                  fit: BoxFit.cover,
                 ),
               ),
             ),
+          // Expanded(
+          //   flex: 1,
+          //   child: Container(
+          //     decoration: BoxDecoration(
+          //       color: AppTheme.primaryColor.withOpacity(0.05),
+          //       image: DecorationImage(
+          //         image: NetworkImage(
+          //             "https://www.pjspaul.org/wp-content/uploads/2020/12/sir_about.jpg",
+          //             webHtmlElementStrategy: WebHtmlElementStrategy
+          //                 .prefer), // Placeholder high-quality abstract image or church image
+          //         fit: BoxFit.cover,
+          //         opacity: 0.8,
+          //       ),
+          //     ),
+          //     child: ,
+          //   ),
+          // ),
 
           // Right Side - Login Form
           Expanded(

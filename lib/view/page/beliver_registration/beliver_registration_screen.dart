@@ -29,12 +29,12 @@ class _BeliverRegistrationScreenState extends State<BeliverRegistrationScreen> {
     controller.refreshCurrent();
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(height: 20),
-          Expanded(
-            child: Obx(() {
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 20),
+            Obx(() {
               return (!controller.isGo.value)
                   ? const Center(child: CircularProgressIndicator())
                   : (controller.listData.isEmpty)
@@ -44,8 +44,8 @@ class _BeliverRegistrationScreenState extends State<BeliverRegistrationScreen> {
                           itemBuilder: (context, index) => _buildCard(index),
                         );
             }),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

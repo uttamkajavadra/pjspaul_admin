@@ -35,36 +35,36 @@ class _OtherScreenState extends State<OtherScreen> {
           const SizedBox(height: 20),
           Obx(() {
             return Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (controller.selectedIndex.value == 2)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const SizedBox(height: 20),
-                          SizedBox(
-                            width: 100,
-                            child: CustomElevatedButton(
-                                onPressed: () {
-                                  controller.isShowAdd.value =
-                                      !controller.isShowAdd.value;
-                                },
-                                buttonText: (controller.isShowAdd.value)
-                                    ? "Hide"
-                                    : "+ Add"),
-                          ),
-                          if (controller.selectedIndex.value == 2 &&
-                              controller.isShowAdd.value == true)
-                            const LifeChangingMessageLive(),
-                          const SizedBox(height: 20),
-                        ],
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (controller.selectedIndex.value == 2)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const SizedBox(height: 20),
+                            SizedBox(
+                              width: 100,
+                              child: CustomElevatedButton(
+                                  onPressed: () {
+                                    controller.isShowAdd.value =
+                                        !controller.isShowAdd.value;
+                                  },
+                                  buttonText: (controller.isShowAdd.value)
+                                      ? "Hide"
+                                      : "+ Add"),
+                            ),
+                            if (controller.selectedIndex.value == 2 &&
+                                controller.isShowAdd.value == true)
+                              const LifeChangingMessageLive(),
+                            const SizedBox(height: 20),
+                          ],
+                        ),
                       ),
-                    ),
-                  Expanded(
-                    child: (!controller.isGo.value)
+                    (!controller.isGo.value)
                         ? const Center(child: CircularProgressIndicator())
                         : (controller.listData.isEmpty)
                             ? const Center(child: Text("No data found"))
@@ -73,8 +73,8 @@ class _OtherScreenState extends State<OtherScreen> {
                                 itemBuilder: (context, index) =>
                                     _buildCard(index),
                               ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             );
           }),

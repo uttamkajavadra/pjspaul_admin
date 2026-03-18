@@ -13,7 +13,7 @@ class BeliverRegistrationController extends GetxController {
       "Full Name",
       "Location",
       "Contact Number",
-      "Age",
+      "Birth Date",
       "Profession",
       "Date",
       "Delete"
@@ -34,7 +34,7 @@ class BeliverRegistrationController extends GetxController {
       "Full Name",
       "Address",
       "Contact Number",
-      "Age",
+      "Birth Date",
       "Gender",
       "Education",
       "Reason to pursue Bible college",

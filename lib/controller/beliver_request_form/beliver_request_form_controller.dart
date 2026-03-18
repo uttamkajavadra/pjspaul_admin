@@ -33,6 +33,8 @@ class BeliverRequestFormController extends GetxController {
       "Location",
       "Contact Number",
       "Visit requested for",
+      "Visit Date",
+      "Visit Time",
       "Date",
       "Delete"
     ],
@@ -67,7 +69,7 @@ class BeliverRequestFormController extends GetxController {
       "Full Name",
       "Complete Address",
       "Contact Number",
-      "Volunteering Area of Interest",
+      // "Volunteering Area of Interest",
       "Profession",
       "Volunteer Type",
       "Date",
@@ -212,7 +214,7 @@ class BeliverRequestFormController extends GetxController {
 
   Future<void> getCottagePrayer() async {
     await _fetchCollection(
-        'cottage_prayers', ['name', 'location', 'contact', 'visit_request']);
+        'cottage_prayers', ['name', 'location', 'contact', 'visit_request', 'date', 'time']);
   }
 
   Future<void> getCounselingRequest() async {
@@ -239,7 +241,7 @@ class BeliverRequestFormController extends GetxController {
       'name',
       'address',
       'contact',
-      'area_of_interest',
+      // 'area_of_interest',
       'profession',
       'volunteer_type'
     ]);

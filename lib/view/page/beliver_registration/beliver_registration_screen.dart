@@ -131,7 +131,7 @@ class _BeliverRegistrationScreenState extends State<BeliverRegistrationScreen> {
               const Spacer(),
               const Divider(),
               const SizedBox(height: 8),
-              Row(
+              Column(
                 children: [
                   Text(
                     "Click to view full details",
@@ -140,7 +140,7 @@ class _BeliverRegistrationScreenState extends State<BeliverRegistrationScreen> {
                         fontSize: 12,
                         fontWeight: FontWeight.w500),
                   ),
-                  const Spacer(),
+                  // const Spacer(),
                   Text(
                     date,
                     style: TextStyle(color: Colors.grey[400], fontSize: 12),

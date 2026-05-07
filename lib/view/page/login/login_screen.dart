@@ -30,9 +30,10 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Container(
                 height: double.infinity,
                 color: AppTheme.primaryColor.withOpacity(0.05),
-                child: Image.network(
-                  "https://www.pjspaul.org/wp-content/uploads/2020/12/sir_about.jpg",
-                  webHtmlElementStrategy: WebHtmlElementStrategy.prefer,
+                child: Image.asset(
+                  "assets/pjs_logo.png",
+                  // "https://www.pjspaul.org/wp-content/uploads/2020/12/sir_about.jpg",
+                  // webHtmlElementStrategy: WebHtmlElementStrategy.prefer,
                   fit: BoxFit.cover,
                 ),
               ),

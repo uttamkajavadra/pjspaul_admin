@@ -6,12 +6,16 @@ class ResponsiveDataTable extends StatelessWidget {
   final List<String> headers;
   final List<List<String>> data;
   final void Function(int index) onDelete;
+  final void Function(int index)? onToggleStatus;
+  final bool isOldTab;
 
   const ResponsiveDataTable({
     super.key,
     required this.headers,
     required this.data,
     required this.onDelete,
+    this.onToggleStatus,
+    this.isOldTab = false,
   });
 
   @override
@@ -39,12 +43,21 @@ class ResponsiveDataTable extends StatelessWidget {
               headingRowColor: WidgetStateProperty.resolveWith(
                   (states) => Colors.grey.shade100),
               dataRowMaxHeight: 65,
-              columns: headers.map((h) => DataColumn(
+              columns: [
+                ...headers.map((h) => DataColumn(
+                      label: Text(
+                        h,
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                      ),
+                    )),
+                if (onToggleStatus != null)
+                  const DataColumn(
                     label: Text(
-                      h,
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                      "Status",
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                     ),
-                  )).toList(),
+                  ),
+              ],
               rows: List.generate(data.length, (index) {
                 final row = data[index];
                 return DataRow(
@@ -87,6 +100,7 @@ class ResponsiveDataTable extends StatelessWidget {
                         IconButton(
                           icon: const Icon(Icons.delete_outline, color: Colors.red),
                           onPressed: () => onDelete(index),
+                          tooltip: "Delete",
                         ),
                       );
                     }
@@ -128,7 +142,24 @@ class ResponsiveDataTable extends StatelessWidget {
                         ),
                       ),
                     );
-                  }),
+                  })
+                  ..add(
+                    onToggleStatus != null
+                        ? DataCell(
+                            ElevatedButton.icon(
+                              onPressed: () => onToggleStatus!(index),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: isOldTab ? Colors.green : Colors.blue,
+                                foregroundColor: Colors.white,
+                                elevation: 0,
+                              ),
+                              icon: Icon(isOldTab ? Icons.restore : Icons.archive, size: 16),
+                              label: Text(isOldTab ? "Move to New" : "Move to Old", style: const TextStyle(fontSize: 12)),
+                            ),
+                          )
+                        : const DataCell(SizedBox.shrink()),
+                  )
+                  ..removeWhere((cell) => onToggleStatus == null && cell.child is SizedBox),
                 );
               }),
             ),

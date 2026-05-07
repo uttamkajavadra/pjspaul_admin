@@ -7,6 +7,7 @@ import 'package:pjspaul_admin/view/widget/progressbar.dart';
 
 class BeliverRegistrationController extends GetxController {
   RxBool isGo = true.obs;
+  RxBool isShowOld = false.obs;
 
   List<List<String>> list = [
     [
@@ -102,6 +103,9 @@ class BeliverRegistrationController extends GetxController {
         await FirebaseFirestore.instance.collection(collection).get();
     for (var doc in snapshot.docs) {
       var data = doc.data();
+      bool isOldEntry = data['is_old'] == true;
+      if (isShowOld.value != isOldEntry) continue;
+
       tempIds.add(doc.id);
       List<String> row = fields.map((f) => (data[f] ?? '').toString()).toList();
       row.add(_formatDate(data['created_at']));
@@ -146,7 +150,41 @@ class BeliverRegistrationController extends GetxController {
     }
   }
 
-  void refreshCurrent() {
+  Future<void> toggleStatus(BuildContext context, int index) async {
+    String collection = '';
+    if (selectedIndex.value == 0)
+      collection = 'youth_registration';
+    else if (selectedIndex.value == 1)
+      collection = 'leader_register';
+    else if (selectedIndex.value == 2)
+      collection = 'college_register';
+    else if (selectedIndex.value == 3)
+      collection = 'business_register';
+    else if (selectedIndex.value == 4)
+      collection = 'baptism_register';
+    else if (selectedIndex.value == 5)
+      collection = 'doctor_register';
+    else if (selectedIndex.value == 6) collection = 'chain_prayer_register';
+
+    try {
+      ProgressBar.instance.showProgressbar(context);
+      await FirebaseFirestore.instance
+          .collection(collection)
+          .doc(listId[index])
+          .set({'is_old': !isShowOld.value}, SetOptions(merge: true));
+      ProgressBar.instance.stopProgressBar(context);
+      CustomToast.instance.showMsg(isShowOld.value ? "Moved to New Entries" : "Moved to Old Entries");
+    } catch (e) {
+      ProgressBar.instance.stopProgressBar(context);
+      CustomToast.instance.showMsg("Something went wrong");
+    } finally {
+      refreshCurrent();
+    }
+  }
+
+  void refreshCurrent() async {
+    isGo.value = false;
+    await Future.delayed(const Duration(seconds: 1));
     if (selectedIndex.value == 0)
       getYouthRegistration();
     else if (selectedIndex.value == 1)

@@ -34,6 +34,20 @@ class _BeliverRequestFormScreenState extends State<BeliverRequestFormScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 20),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              child: Obx(() => SegmentedButton<bool>(
+                    segments: const [
+                      ButtonSegment(value: false, label: Text("New Entries")),
+                      ButtonSegment(value: true, label: Text("Old Entries")),
+                    ],
+                    selected: {controller.isShowOld.value},
+                    onSelectionChanged: (Set<bool> newSelection) {
+                      controller.isShowOld.value = newSelection.first;
+                      controller.refreshCurrent();
+                    },
+                  )),
+            ),
             Obx(() {
               return (!controller.isGo.value)
                   ? const Center(child: CircularProgressIndicator())
@@ -42,6 +56,8 @@ class _BeliverRequestFormScreenState extends State<BeliverRequestFormScreen> {
                       : ResponsiveDataTable(
                           headers: controller.list[controller.selectedIndex.value],
                           data: controller.listData,
+                          isOldTab: controller.isShowOld.value,
+                          onToggleStatus: (index) => controller.toggleStatus(context, index),
                           onDelete: (index) {
                             DeleteConfirmationDialog.show(
                               context,

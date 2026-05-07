@@ -33,6 +33,21 @@ class _OtherScreenState extends State<OtherScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 20),
+          Padding(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            child: Obx(() => SegmentedButton<bool>(
+                  segments: const [
+                    ButtonSegment(value: false, label: Text("New Entries")),
+                    ButtonSegment(value: true, label: Text("Old Entries")),
+                  ],
+                  selected: {controller.isShowOld.value},
+                  onSelectionChanged: (Set<bool> newSelection) {
+                    controller.isShowOld.value = newSelection.first;
+                    controller.refreshCurrent();
+                  },
+                )),
+          ),
           Obx(() {
             return Expanded(
               child: SingleChildScrollView(
@@ -69,12 +84,17 @@ class _OtherScreenState extends State<OtherScreen> {
                         : (controller.listData.isEmpty)
                             ? const Center(child: Text("No data found"))
                             : ResponsiveDataTable(
-                                headers: controller.list[controller.selectedIndex.value],
+                                headers: controller
+                                    .list[controller.selectedIndex.value],
                                 data: controller.listData,
+                                isOldTab: controller.isShowOld.value,
+                                onToggleStatus: (index) =>
+                                    controller.toggleStatus(context, index),
                                 onDelete: (index) {
                                   DeleteConfirmationDialog.show(
                                     context,
-                                    onConfirm: () => controller.deleteRecord(context, index),
+                                    onConfirm: () =>
+                                        controller.deleteRecord(context, index),
                                   );
                                 },
                               ),
@@ -87,6 +107,4 @@ class _OtherScreenState extends State<OtherScreen> {
       ),
     );
   }
-
-
 }

@@ -8,6 +8,7 @@ import 'package:pjspaul_admin/view/widget/progressbar.dart';
 class OtherController extends GetxController {
   RxBool isGo = true.obs;
   RxBool isShowAdd = false.obs;
+  RxBool isShowOld = false.obs;
 
   List<List<String>> list = [
     ["Location", "Date", "Delete"],
@@ -84,6 +85,32 @@ class OtherController extends GetxController {
     }
   }
 
+  Future<void> toggleStatus(BuildContext context, int index) async {
+    final collectionMap = {
+      0: 'life_changing_church',
+      1: 'pjs_ministies',
+      2: 'life_tv_program',
+      3: 'email',
+      4: 'donation',
+    };
+    final collection = collectionMap[selectedIndex.value] ?? '';
+    try {
+      ProgressBar.instance.showProgressbar(context);
+      await FirebaseFirestore.instance
+          .collection(collection)
+          .doc(listId[index])
+          .set({'is_old': !isShowOld.value}, SetOptions(merge: true));
+      ProgressBar.instance.stopProgressBar(context);
+      CustomToast.instance.showMsg(
+          isShowOld.value ? "Moved to New Entries" : "Moved to Old Entries");
+    } catch (e) {
+      ProgressBar.instance.stopProgressBar(context);
+      CustomToast.instance.showMsg("Something went wrong");
+    } finally {
+      refreshCurrent();
+    }
+  }
+
   void refreshCurrent() {
     switch (selectedIndex.value) {
       case 0:
@@ -114,6 +141,9 @@ class OtherController extends GetxController {
         .get();
     for (var doc in snapshot.docs) {
       var data = doc.data();
+      bool isOldEntry = data['is_old'] == true;
+      if (isShowOld.value != isOldEntry) continue;
+
       tempIds.add(doc.id);
       tempData.add(
           [data["location"] ?? '', _formatDate(data["created_at"]), 'delete']);
@@ -133,6 +163,9 @@ class OtherController extends GetxController {
         await FirebaseFirestore.instance.collection('pjs_ministies').get();
     for (var doc in snapshot.docs) {
       var data = doc.data();
+      bool isOldEntry = data['is_old'] == true;
+      if (isShowOld.value != isOldEntry) continue;
+
       tempIds.add(doc.id);
       tempData.add([
         data["ministry_location"] ?? '',
@@ -155,6 +188,9 @@ class OtherController extends GetxController {
         await FirebaseFirestore.instance.collection('life_tv_program').get();
     for (var doc in snapshot.docs) {
       var data = doc.data();
+      bool isOldEntry = data['is_old'] == true;
+      if (isShowOld.value != isOldEntry) continue;
+
       tempIds.add(doc.id);
       tempData.add([
         data["tv_program"] ?? '',
@@ -176,6 +212,9 @@ class OtherController extends GetxController {
     final snapshot = await FirebaseFirestore.instance.collection('email').get();
     for (var doc in snapshot.docs) {
       var data = doc.data();
+      bool isOldEntry = data['is_old'] == true;
+      if (isShowOld.value != isOldEntry) continue;
+
       tempIds.add(doc.id);
       tempData.add([
         data["name"] ?? '',
@@ -202,6 +241,9 @@ class OtherController extends GetxController {
         await FirebaseFirestore.instance.collection('donation').get();
     for (var doc in snapshot.docs) {
       var data = doc.data();
+      bool isOldEntry = data['is_old'] == true;
+      if (isShowOld.value != isOldEntry) continue;
+
       tempIds.add(doc.id);
       tempData.add([
         data["donor_name"] ?? '',

@@ -8,6 +8,7 @@ import 'package:pjspaul_admin/view/widget/progressbar.dart';
 
 class BeliverRequestFormController extends GetxController {
   RxBool isGo = true.obs;
+  RxBool isShowOld = false.obs;
 
   List<List<String>> list = [
     [
@@ -103,6 +104,9 @@ class BeliverRequestFormController extends GetxController {
         await FirebaseFirestore.instance.collection(collection).get();
     for (var doc in snapshot.docs) {
       var data = doc.data();
+      bool isOldEntry = data['is_old'] == true;
+      if (isShowOld.value != isOldEntry) continue;
+
       tempIds.add(doc.id);
       List<String> row = fields.map((f) => (data[f] ?? '').toString()).toList();
       row.add(_formatDate(data['created_at']));
@@ -171,7 +175,38 @@ class BeliverRequestFormController extends GetxController {
     }
   }
 
-  void refreshCurrent() {
+  Future<void> toggleStatus(BuildContext context, int index) async {
+    final collectionMap = {
+      0: 'prayer_request',
+      1: 'testimony_request',
+      2: 'cottage_prayers',
+      3: 'counseling_request',
+      4: 'feedback_request',
+      5: 'pastor_request',
+      6: 'child_dedication',
+      7: 'volunteer_enrollment',
+    };
+    final collection = collectionMap[selectedIndex.value] ?? '';
+
+    try {
+      ProgressBar.instance.showProgressbar(context);
+      await FirebaseFirestore.instance
+          .collection(collection)
+          .doc(listId[index])
+          .set({'is_old': !isShowOld.value}, SetOptions(merge: true));
+      ProgressBar.instance.stopProgressBar(context);
+      CustomToast.instance.showMsg(isShowOld.value ? "Moved to New Entries" : "Moved to Old Entries");
+    } catch (e) {
+      ProgressBar.instance.stopProgressBar(context);
+      CustomToast.instance.showMsg("Something went wrong");
+    } finally {
+      refreshCurrent();
+    }
+  }
+
+  void refreshCurrent() async {
+    isGo.value = false;
+    await Future.delayed(const Duration(seconds: 1));
     switch (selectedIndex.value) {
       case 0:
         getPrayerRequest();

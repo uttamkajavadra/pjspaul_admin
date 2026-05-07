@@ -692,4 +692,15 @@ class BeliverSpritualContentController extends GetxController {
       getLifeSong();
     }
   }
+
+  void refreshCurrent() {
+    switch (selectedIndex.value) {
+      case 0: getRadioLink(); break;
+      case 1: getTodayBlessing(); break;
+      case 2: getUpcomingEvent(); break;
+      case 3: getShortMessage(); break;
+      case 4: getLifeMessage(); break;
+      case 5: getLifeSong(); break;
+    }
+  }
 }

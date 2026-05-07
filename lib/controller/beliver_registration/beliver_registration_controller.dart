@@ -173,12 +173,24 @@ class BeliverRegistrationController extends GetxController {
           .doc(listId[index])
           .set({'is_old': !isShowOld.value}, SetOptions(merge: true));
       ProgressBar.instance.stopProgressBar(context);
-      CustomToast.instance.showMsg(isShowOld.value ? "Moved to New Entries" : "Moved to Old Entries");
+
+      listId.removeAt(index);
+      listData.removeAt(index);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(isShowOld.value ? "Moved to New Entries" : "Moved to Old Entries"),
+          backgroundColor: Colors.green,
+        ),
+      );
     } catch (e) {
       ProgressBar.instance.stopProgressBar(context);
-      CustomToast.instance.showMsg("Something went wrong");
-    } finally {
-      refreshCurrent();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Something went wrong"),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 
